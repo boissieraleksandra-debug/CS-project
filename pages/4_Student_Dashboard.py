@@ -23,7 +23,7 @@ st.bar_chart(data.set_index("Category"))
 
 st.subheader("🧩 My Task Progress")
 tasks = [
-    {"task": "Market Research", "startup": "GrowthAI", "status": "Applied"},
+    {"task": "Market Research", "startup": "GrowthAI", "status": "Liked"},
     {"task": "Pitch Deck Update", "startup": "BrightLabs", "status": "Matched"},
     {"task": "Data Cleanup", "startup": "FlowTech", "status": "Assigned"},
     {"task": "User Testing", "startup": "Nova Studio", "status": "In Progress"},
