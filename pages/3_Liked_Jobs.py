@@ -2,22 +2,8 @@ import streamlit as st
 
 st.set_page_config(page_title="Liked Jobs", page_icon="❤️", layout="wide")
 
-liked_jobs = [
-    {
-        "title": "Marketing Intern",
-        "startup": "GrowthAI",
-        "status": "Saved",
-        "match": 85,
-        "location": "Zurich"
-    },
-    {
-        "title": "Product Intern",
-        "startup": "TechFlow",
-        "status": "Matched",
-        "match": 92,
-        "location": "Remote"
-    }
-]
+if "liked_jobs" not in st.session_state:
+    st.session_state.liked_jobs = []
 
 st.markdown("""
 <style>
@@ -66,6 +52,13 @@ st.markdown("""
         margin-bottom: 12px;
     }
 
+    .job-description {
+        color: #4B5563;
+        font-size: 15px;
+        line-height: 1.6;
+        margin-bottom: 14px;
+    }
+
     .pill {
         display: inline-block;
         padding: 8px 12px;
@@ -73,16 +66,7 @@ st.markdown("""
         font-size: 12px;
         font-weight: 800;
         margin-right: 8px;
-    }
-
-    .saved {
-        background: #FEE2E2;
-        color: #B91C1C;
-    }
-
-    .matched {
-        background: #DBEAFE;
-        color: #1D4ED8;
+        margin-bottom: 8px;
     }
 
     .neutral {
@@ -93,17 +77,26 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown('<div class="page-title">❤️ Liked Jobs</div>', unsafe_allow_html=True)
-st.markdown('<div class="page-subtitle">Tasks you saved or matched with, ready to revisit anytime.</div>', unsafe_allow_html=True)
+st.markdown('<div class="page-subtitle">Your saved startup tasks appear here.</div>', unsafe_allow_html=True)
 
-for job in liked_jobs:
-    status_class = "matched" if job["status"] == "Matched" else "saved"
+if len(st.session_state.liked_jobs) == 0:
+    st.info("You haven’t liked any jobs yet. Go to Discover Jobs and press Like.")
+else:
+    for i, job in enumerate(st.session_state.liked_jobs):
+        st.markdown(f"""
+        <div class="liked-card">
+            <div class="job-title">{job['title']}</div>
+            <div class="job-company">🏢 {job['startup']}</div>
+            <div class="job-description">{job['description']}</div>
+            <span class="pill neutral">📂 {job['category']}</span>
+            <span class="pill neutral">📍 {job['location']}</span>
+            <span class="pill neutral">⏳ {job['duration']}</span>
+            <span class="pill neutral">💰 {job['pay']}</span>
+            <span class="pill neutral">🎯 {job['match']}% match</span>
+        </div>
+        """, unsafe_allow_html=True)
 
-    st.markdown(f"""
-    <div class="liked-card">
-        <div class="job-title">{job['title']}</div>
-        <div class="job-company">🏢 {job['startup']}</div>
-        <span class="pill {status_class}">{job['status']}</span>
-        <span class="pill neutral">📍 {job['location']}</span>
-        <span class="pill neutral">🎯 {job['match']}% match</span>
-    </div>
-    """, unsafe_allow_html=True)
+        if st.button("Remove", key=f"remove_{i}"):
+            st.session_state.liked_jobs.pop(i)
+            st.rerun()
+
