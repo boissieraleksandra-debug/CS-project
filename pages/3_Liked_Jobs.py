@@ -97,12 +97,17 @@ st.markdown("""
         background: #3B82F6;
         color: white;
     }
+
+    .section-space {
+        margin-top: 30px;
+    }
 </style>
 """, unsafe_allow_html=True)
 
 st.markdown('<div class="page-title">❤️ Liked Jobs</div>', unsafe_allow_html=True)
 st.markdown('<div class="page-subtitle">Your saved startup tasks appear here. You can apply directly from this page.</div>', unsafe_allow_html=True)
 
+# LIKED JOBS SECTION
 if len(st.session_state.liked_jobs) == 0:
     st.info("You haven’t liked any jobs yet. Go to Discover Jobs and press Like.")
 else:
@@ -121,10 +126,17 @@ else:
         </div>
         """, unsafe_allow_html=True)
 
-        col1, col2, col3 = st.columns([1, 2, 1])
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.button("Apply Now", key=f"apply_{i}", on_click=toggle_form, args=(i,), use_container_width=True)
 
         with col2:
-            st.button("Apply Now", key=f"apply_{i}", on_click=toggle_form, args=(i,), use_container_width=True)
+            if st.button("Remove", key=f"remove_{i}", use_container_width=True):
+                st.session_state.liked_jobs.pop(i)
+                if st.session_state.show_form_for == i:
+                    st.session_state.show_form_for = None
+                st.rerun()
 
         if st.session_state.show_form_for == i:
             st.markdown("## Application Form")
@@ -152,12 +164,12 @@ else:
                     st.success("Application submitted successfully!")
                     st.rerun()
 
-        if st.button("Remove", key=f"remove_{i}"):
-            st.session_state.liked_jobs.pop(i)
-            if st.session_state.show_form_for == i:
+            if st.button("Cancel", key=f"cancel_{i}", use_container_width=True):
                 st.session_state.show_form_for = None
-            st.rerun()
+                st.rerun()
 
+# APPLIED JOBS SECTION
+st.markdown('<div class="section-space"></div>', unsafe_allow_html=True)
 st.markdown("## 📩 Applied Jobs")
 
 if len(st.session_state.applied_jobs) == 0:
@@ -177,4 +189,8 @@ else:
             <span class="pill status-applied">Applied</span>
         </div>
         """, unsafe_allow_html=True)
+
+        if st.button("Remove Application", key=f"remove_applied_{j}", use_container_width=True):
+            st.session_state.applied_jobs.pop(j)
+            st.rerun()
 
