@@ -144,7 +144,7 @@ st.markdown('</div>', unsafe_allow_html=True)
 st.markdown('<div class="section-title">🧩 My Task Progress</div>', unsafe_allow_html=True)
 
 tasks = [
-    {"task": "Market Research", "startup": "GrowthAI", "status": "Liked"},
+    {"task": "Market Research", "startup": "GrowthAI", "status": "Applied"},
     {"task": "Pitch Deck Update", "startup": "BrightLabs", "status": "Matched"},
     {"task": "Data Cleanup", "startup": "FlowTech", "status": "Assigned"},
     {"task": "User Testing", "startup": "Nova Studio", "status": "In Progress"},
