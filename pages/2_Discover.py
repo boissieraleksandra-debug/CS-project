@@ -5,6 +5,9 @@ st.set_page_config(page_title="Discover Jobs", page_icon="🔍", layout="wide")
 if "liked_jobs" not in st.session_state:
     st.session_state.liked_jobs = []
 
+if "applied_jobs" not in st.session_state:
+    st.session_state.applied_jobs = []
+
 jobs = [
     {
         "title": "Marketing Intern",
@@ -169,7 +172,14 @@ for i, job in enumerate(jobs):
                 for liked_job in st.session_state.liked_jobs
             )
 
-            if not already_liked:
+            already_applied = any(
+                applied_job["title"] == job["title"] and applied_job["startup"] == job["startup"]
+                for applied_job in st.session_state.applied_jobs
+            )
+
+            if already_applied:
+                st.info(f"You already applied to {job['title']} at {job['startup']}.")
+            elif not already_liked:
                 st.session_state.liked_jobs.append(job)
                 st.success(f"You liked {job['title']} at {job['startup']}.")
             else:
