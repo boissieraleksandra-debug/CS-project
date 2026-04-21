@@ -174,5 +174,4 @@ for i, job in enumerate(jobs):
                 st.success(f"You liked {job['title']} at {job['startup']}.")
             else:
                 st.info(f"{job['title']} is already in your liked jobs.")
-
-
+             
