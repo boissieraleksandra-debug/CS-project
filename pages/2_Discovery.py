@@ -7,3 +7,4 @@ with st.container(border=True):
     st.write("Location:", "Zurich, SUI")
     st.write("Duration:", "3 months")
     st.write("Tags:", "Sales, Revenues")
+    st.write("Come and join us!")
