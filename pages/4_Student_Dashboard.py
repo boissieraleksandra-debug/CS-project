@@ -32,11 +32,11 @@ tasks = [
 
 def status_color(status):
     colors = {
-        "Liked": "#9CA3AF",
-        "Matched": "#3B82F6",
-        "Assigned": "#10B981",
+        "Liked": "#EF4444",
+        "Matched": "#10B981",
+        "Assigned": "#3B82F6",
         "In Progress": "#F59E0B",
-        "Completed": "#8B5CF6"
+        "Completed": "#6B7280"
     }
     return colors.get(status, "#111827")
 
