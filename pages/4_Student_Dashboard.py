@@ -2,10 +2,10 @@ import streamlit as st
 import pandas as pd
 
 st.title("📊 Student Dashboard")
+st.caption("Your activity, matches, and active startup tasks")
 
-# Top metrics
+# Metrics
 col1, col2, col3 = st.columns(3)
-
 col1.metric("Tasks Viewed", 12)
 col2.metric("Tasks Liked", 5)
 col3.metric("Avg Match Score", "85%")
@@ -16,12 +16,12 @@ data = pd.DataFrame({
     "Likes": [3, 1, 1]
 })
 
-st.subheader("Liked Tasks by Category")
+st.markdown("### Liked Tasks by Category")
 st.bar_chart(data.set_index("Category"))
 
-# Task progress section
+# Task progress
+st.markdown("### 🧩 My Task Progress")
 
-st.subheader("🧩 My Task Progress")
 tasks = [
     {"task": "Market Research", "startup": "GrowthAI", "status": "Liked"},
     {"task": "Pitch Deck Update", "startup": "BrightLabs", "status": "Matched"},
@@ -33,8 +33,8 @@ tasks = [
 def status_color(status):
     colors = {
         "Liked": "#EF4444",
-        "Matched": "#10B981",
-        "Assigned": "#3B82F6",
+        "Matched": "#3B82F6",
+        "Assigned": "#10B981",
         "In Progress": "#F59E0B",
         "Completed": "#6B7280"
     }
@@ -43,14 +43,14 @@ def status_color(status):
 for t in tasks:
     st.markdown(f"""
     <div style="
-        background-color: #ffffff;
-        padding: 16px;
-        border-radius: 14px;
-        margin-bottom: 12px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        border: 1px solid #f0f0f0;
+        background-color: #FFFFFF;
+        padding: 18px;
+        border-radius: 18px;
+        margin-bottom: 14px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+        border: 1px solid #ECEEF5;
     ">
-        <div style="font-size: 18px; font-weight: 600; color: #111827;">
+        <div style="font-size: 18px; font-weight: 700; color: #111827;">
             {t['task']}
         </div>
         <div style="font-size: 14px; color: #6B7280; margin-top: 4px;">
@@ -58,13 +58,14 @@ for t in tasks:
         </div>
         <div style="
             display: inline-block;
-            margin-top: 10px;
-            padding: 6px 12px;
+            margin-top: 12px;
+            padding: 7px 14px;
             border-radius: 999px;
             background-color: {status_color(t['status'])};
             color: white;
-            font-size: 13px;
-            font-weight: 600;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.2px;
         ">
             {t['status']}
         </div>
