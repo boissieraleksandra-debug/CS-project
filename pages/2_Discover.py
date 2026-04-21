@@ -2,6 +2,9 @@ import streamlit as st
 
 st.set_page_config(page_title="Discover Jobs", page_icon="🔍", layout="wide")
 
+if "liked_jobs" not in st.session_state:
+    st.session_state.liked_jobs = []
+
 jobs = [
     {
         "title": "Marketing Intern",
@@ -123,29 +126,11 @@ st.markdown("""
         line-height: 1.7;
         margin-bottom: 18px;
     }
-
-    .section-card {
-        background: white;
-        border: 1px solid #E8ECF4;
-        border-radius: 22px;
-        padding: 18px;
-        box-shadow: 0 10px 28px rgba(17, 24, 39, 0.05);
-        margin-bottom: 20px;
-    }
 </style>
 """, unsafe_allow_html=True)
 
 st.markdown('<div class="page-title">🔍 Discover Jobs</div>', unsafe_allow_html=True)
-st.markdown('<div class="page-subtitle">Swipe-style browsing for startup tasks that match your interests, availability, and skills.</div>', unsafe_allow_html=True)
-
-filter_col1, filter_col2, filter_col3 = st.columns(3)
-
-with filter_col1:
-    st.selectbox("Category", ["All", "Marketing", "Product", "Design", "Research"])
-with filter_col2:
-    st.selectbox("Location", ["All", "Remote", "Zurich", "Geneva"])
-with filter_col3:
-    st.selectbox("Duration", ["All", "2 months", "3 months", "6 months"])
+st.markdown('<div class="page-subtitle">Browse startup tasks and save the ones you like.</div>', unsafe_allow_html=True)
 
 for i, job in enumerate(jobs):
     st.markdown(f"""
@@ -169,12 +154,25 @@ for i, job in enumerate(jobs):
     </div>
     """, unsafe_allow_html=True)
 
-    col1, col2, col3 = st.columns([1, 1, 1])
+    col1, col2, col3 = st.columns(3)
 
     with col1:
         st.button("❌ Pass", key=f"pass_{i}", use_container_width=True)
+
     with col2:
         st.button("👀 Details", key=f"details_{i}", use_container_width=True)
+
     with col3:
-        st.button("❤️ Like", key=f"like_{i}", use_container_width=True)
+        if st.button("❤️ Like", key=f"like_{i}", use_container_width=True):
+            already_liked = any(
+                liked_job["title"] == job["title"] and liked_job["startup"] == job["startup"]
+                for liked_job in st.session_state.liked_jobs
+            )
+
+            if not already_liked:
+                st.session_state.liked_jobs.append(job)
+                st.success(f"You liked {job['title']} at {job['startup']}.")
+            else:
+                st.info(f"{job['title']} is already in your liked jobs.")
+
 
