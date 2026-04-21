@@ -20,18 +20,19 @@ st.subheader("Liked Tasks by Category")
 st.bar_chart(data.set_index("Category"))
 
 # Task progress section
-st.subheader("🧩 My Task Progress")
 
+st.subheader("🧩 My Task Progress")
 tasks = [
-    {"task": "Market Research", "startup": "GrowthAI", "status": "Matched"},
-    {"task": "Pitch Deck Update", "startup": "BrightLabs", "status": "Assigned"},
-    {"task": "Data Cleanup", "startup": "FlowTech", "status": "In Progress"},
-    {"task": "User Testing", "startup": "Nova Studio", "status": "Completed"},
+    {"task": "Market Research", "startup": "GrowthAI", "status": "Applied"},
+    {"task": "Pitch Deck Update", "startup": "BrightLabs", "status": "Matched"},
+    {"task": "Data Cleanup", "startup": "FlowTech", "status": "Assigned"},
+    {"task": "User Testing", "startup": "Nova Studio", "status": "In Progress"},
+    {"task": "Brand Audit", "startup": "SparkStudio", "status": "Completed"},
 ]
 
 def status_color(status):
     colors = {
-        "Liked": "#9CA3AF",
+        "Applied": "#9CA3AF",
         "Matched": "#3B82F6",
         "Assigned": "#10B981",
         "In Progress": "#F59E0B",
