@@ -1,15 +1,13 @@
 import streamlit as st
 from db import init_db, get_startup_profile, save_startup_profile
-from ui import apply_styles, header
 
 st.set_page_config(page_title="Startup Profile", page_icon="🏢", layout="wide")
 init_db()
-apply_styles()
 
 if st.session_state.get("role") != "startup":
     st.stop()
 
-header("🏢 Startup Profile", "Create your startup profile and start posting tasks.")
+st.title("🏢 Startup Profile")
 
 profile = get_startup_profile()
 
@@ -25,6 +23,7 @@ if st.button("Save Startup Profile", use_container_width=True):
         "industry": industry,
         "location": location,
         "description": description,
-        "contact_email": contact_email,
+        "contact_email": contact_email
     })
-    st.success("Startup profile saved.")
+    st.session_state.startup_name = startup_name
+    st.success("Startup profile saved")
