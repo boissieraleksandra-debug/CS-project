@@ -1,26 +1,26 @@
 import streamlit as st
-from db import conn, init_db, create_application, save_task_for_student, get_saved_task_ids
+from db import init_db, get_all_tasks, get_saved_task_ids, remove_saved_task, create_application
 
-st.set_page_config(page_title="Discover Tasks", page_icon="🔍", layout="wide")
+st.set_page_config(page_title="Saved Tasks", page_icon="❤️", layout="wide")
 init_db()
 
 if st.session_state.get("role") != "student":
+    st.warning("Please go to the home page and choose Student first.")
     st.stop()
 
-st.title("🔍 Discover Tasks")
+if "show_apply_for" not in st.session_state:
+    st.session_state.show_apply_for = None
 
-if "apply_task" not in st.session_state:
-    st.session_state.apply_task = None
+st.title("❤️ Saved Tasks")
 
-tasks = conn.execute("SELECT * FROM tasks ORDER BY id DESC").fetchall()
+tasks = get_all_tasks()
 saved_ids = set(get_saved_task_ids())
+saved_tasks = [t for t in tasks if t["id"] in saved_ids]
 
-if not tasks:
-    st.info("No tasks available yet.")
+if not saved_tasks:
+    st.info("No saved tasks yet.")
 else:
-    for task_row in tasks:
-        task = dict(task_row)
-
+    for task in saved_tasks:
         st.markdown(f"""
         ### {task['title']}
         🏢 {task['startup_name']}  
@@ -31,44 +31,38 @@ else:
         col1, col2 = st.columns(2)
 
         with col1:
-            if st.button("❤️ Save", key=f"save_{task['id']}"):
-                if task["id"] in saved_ids:
-                    st.info("Task already saved.")
-                else:
-                    save_task_for_student(task["id"])
-                    st.success("Task saved.")
-                    st.rerun()
+            if st.button("Apply Now", key=f"apply_saved_{task['id']}"):
+                st.session_state.show_apply_for = task["id"]
 
         with col2:
-            if st.button("Apply", key=f"apply_{task['id']}"):
-                st.session_state.apply_task = task
+            if st.button("Remove", key=f"remove_saved_{task['id']}"):
+                remove_saved_task(task["id"])
+                if st.session_state.show_apply_for == task["id"]:
+                    st.session_state.show_apply_for = None
+                st.rerun()
+
+        if st.session_state.show_apply_for == task["id"]:
+            with st.form(f"saved_apply_form_{task['id']}"):
+                name = st.text_input("Full Name", value=st.session_state.get("student_name", ""))
+                email = st.text_input("Email")
+                phone = st.text_input("Phone")
+                message = st.text_area("Short Message")
+                cv = st.file_uploader("Upload CV", key=f"saved_cv_{task['id']}")
+
+                submitted = st.form_submit_button("Submit Application")
+
+                if submitted:
+                    create_application(
+                        task,
+                        name,
+                        email,
+                        phone,
+                        message,
+                        cv.name if cv else "No CV"
+                    )
+                    remove_saved_task(task["id"])
+                    st.session_state.show_apply_for = None
+                    st.success("Application sent.")
+                    st.rerun()
 
         st.divider()
-
-if st.session_state.apply_task is not None:
-    task = st.session_state.apply_task
-
-    st.subheader(f"Apply to {task['title']}")
-
-    with st.form("apply_form"):
-        name = st.text_input("Full Name", value=st.session_state.get("student_name", ""))
-        email = st.text_input("Email")
-        phone = st.text_input("Phone")
-        message = st.text_area("Short Message")
-        cv = st.file_uploader("Upload CV")
-
-        submitted = st.form_submit_button("Submit Application")
-
-        if submitted:
-            create_application(
-                task,
-                name,
-                email,
-                phone,
-                message,
-                cv.name if cv else "No CV"
-            )
-
-            st.success("Application sent.")
-            st.session_state.apply_task = None
-            st.rerun()
