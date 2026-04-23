@@ -1,41 +1,54 @@
 import streamlit as st
-from app_data import initialize_state, update_task_status, remove_applied_task
-from ui import apply_global_styles, page_header, task_card_html
+from db import init_db, get_student_profile, get_applications_for_student, update_application_status, submit_work
+from ui import apply_styles, header, status_badge
 
 st.set_page_config(page_title="Task Progress", page_icon="🧩", layout="wide")
+init_db()
+apply_styles()
 
-initialize_state()
-apply_global_styles()
-page_header("🧩 Task Progress", "Follow your saved and applied startup tasks through each stage.")
+if st.session_state.get("role") != "student":
+    st.stop()
 
-if len(st.session_state.applied_tasks) == 0:
+profile = get_student_profile()
+student_name = profile["full_name"]
+
+header("🧩 Task Progress", "Track every task from application to completion.")
+
+if not student_name:
+    st.warning("Please save your student profile first.")
+    st.stop()
+
+applications = get_applications_for_student(student_name)
+
+if not applications:
     st.info("You haven’t applied to any tasks yet.")
 else:
-    for task in st.session_state.applied_tasks:
-        st.markdown(task_card_html(task, show_status=True), unsafe_allow_html=True)
+    for app in applications:
+        st.markdown(f"""
+        <div class="app-card">
+            <div class="task-title">{app['task_title']}</div>
+            <div class="task-startup">🏢 {app['startup_name']}</div>
+            <div class="task-description">
+                <b>Message:</b> {app['message'] or '-'}<br>
+                <b>Task details:</b> {app['task_details'] or 'No detailed instructions yet.'}<br>
+                <b>Submission note:</b> {app['submission_note'] or '-'}<br>
+                <b>Submission link:</b> {app['submission_link'] or '-'}
+            </div>
+            {status_badge(app['status'])}
+        </div>
+        """, unsafe_allow_html=True)
 
-        col1, col2, col3, col4 = st.columns(4)
-
-        with col1:
-            if st.button("Matched", key=f"matched_{task['id']}", use_container_width=True):
-                update_task_status(task["id"], "Matched")
+        if app["status"] == "Matched":
+            if st.button("Start Task", key=f"start_{app['id']}", use_container_width=True):
+                update_application_status(app["id"], "In Progress")
                 st.rerun()
 
-        with col2:
-            if st.button("Assigned", key=f"assigned_{task['id']}", use_container_width=True):
-                update_task_status(task["id"], "Assigned")
-                st.rerun()
-
-        with col3:
-            if st.button("In Progress", key=f"inprogress_{task['id']}", use_container_width=True):
-                update_task_status(task["id"], "In Progress")
-                st.rerun()
-
-        with col4:
-            if st.button("Completed", key=f"completed_{task['id']}", use_container_width=True):
-                update_task_status(task["id"], "Completed")
-                st.rerun()
-
-        if st.button("Remove Application", key=f"remove_applied_{task['id']}", use_container_width=True):
-            remove_applied_task(task["id"])
-            st.rerun()
+        if app["status"] == "In Progress":
+            with st.form(f"submit_work_{app['id']}"):
+                note = st.text_area("Describe what you completed")
+                link = st.text_input("Paste a link to your work")
+                submitted = st.form_submit_button("Submit Work")
+                if submitted:
+                    submit_work(app["id"], note, link)
+                    st.success("Work submitted.")
+                    st.rerun()
