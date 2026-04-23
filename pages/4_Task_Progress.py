@@ -5,11 +5,16 @@ st.set_page_config(page_title="Task Progress", page_icon="🧩", layout="wide")
 init_db()
 
 if st.session_state.get("role") != "student":
+    st.warning("Please go to the home page and choose Student first.")
     st.stop()
 
 student_name = st.session_state.get("student_name", "")
 
 st.title("🧩 Task Progress")
+
+if not student_name:
+    st.info("Please save your student profile first.")
+    st.stop()
 
 apps = get_applications_for_student(student_name)
 
