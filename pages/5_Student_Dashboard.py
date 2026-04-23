@@ -1,51 +1,66 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from app_data import initialize_state
-from ui import apply_global_styles, page_header
+from db import init_db, get_student_profile, get_applications_for_student, get_saved_task_ids, get_all_tasks
+from ui import apply_styles, header
 
 st.set_page_config(page_title="Student Dashboard", page_icon="📊", layout="wide")
+init_db()
+apply_styles()
 
-initialize_state()
-apply_global_styles()
-page_header("📊 Student Dashboard", "Your activity, task pipeline, and strongest task categories in one place.")
+if st.session_state.get("role") != "student":
+    st.stop()
 
-saved_count = len(st.session_state.saved_tasks)
-applied_count = len(st.session_state.applied_tasks)
-completed_count = sum(1 for task in st.session_state.applied_tasks if task.get("status") == "Completed")
+profile = get_student_profile()
+student_name = profile["full_name"]
 
-col1, col2, col3 = st.columns(3)
-col1.metric("Saved Tasks", saved_count)
-col2.metric("Applications Sent", applied_count)
-col3.metric("Completed Tasks", completed_count)
+header("📊 Student Dashboard", "See your task activity, pipeline, and strongest categories.")
 
-all_tasks = st.session_state.saved_tasks + st.session_state.applied_tasks
+saved_ids = get_saved_task_ids()
+all_tasks = get_all_tasks()
+saved_tasks = [t for t in all_tasks if t["id"] in saved_ids]
+applications = get_applications_for_student(student_name) if student_name else []
 
-if len(all_tasks) > 0:
+completed_count = sum(1 for a in applications if a["status"] == "Completed")
+matched_count = sum(1 for a in applications if a["status"] == "Matched")
+
+c1, c2, c3 = st.columns(3)
+c1.metric("Saved Tasks", len(saved_tasks))
+c2.metric("Applications", len(applications))
+c3.metric("Completed", completed_count)
+
+if saved_tasks or applications:
     category_counts = {}
-    for task in all_tasks:
+    for task in saved_tasks:
         category_counts[task["category"]] = category_counts.get(task["category"], 0) + 1
 
-    df = pd.DataFrame(
-        {"Category": list(category_counts.keys()), "Count": list(category_counts.values())}
-    )
+    task_lookup = {t["id"]: t for t in all_tasks}
+    for app in applications:
+        task = task_lookup.get(app["task_id"])
+        if task:
+            category_counts[task["category"]] = category_counts.get(task["category"], 0) + 1
+
+    df = pd.DataFrame({
+        "Category": list(category_counts.keys()),
+        "Count": list(category_counts.values())
+    })
 
     fig = px.bar(df, x="Category", y="Count", color="Category", text="Count")
     fig.update_layout(showlegend=False)
-    st.subheader("Your Tasks by Category")
+    st.subheader("Your Activity by Category")
     st.plotly_chart(fig, use_container_width=True)
+
+status_counts = {}
+for app in applications:
+    status_counts[app["status"]] = status_counts.get(app["status"], 0) + 1
+
+if status_counts:
+    df2 = pd.DataFrame({
+        "Status": list(status_counts.keys()),
+        "Count": list(status_counts.values())
+    })
+    fig2 = px.pie(df2, names="Status", values="Count", hole=0.55)
+    st.subheader("Application Status Breakdown")
+    st.plotly_chart(fig2, use_container_width=True)
 else:
-    st.info("Start saving or applying to tasks to generate dashboard insights.")
-
-status_counts = {"Applied": 0, "Matched": 0, "Assigned": 0, "In Progress": 0, "Completed": 0}
-for task in st.session_state.applied_tasks:
-    if task["status"] in status_counts:
-        status_counts[task["status"]] += 1
-
-status_df = pd.DataFrame(
-    {"Status": list(status_counts.keys()), "Count": list(status_counts.values())}
-)
-
-fig2 = px.pie(status_df, names="Status", values="Count", hole=0.55)
-st.subheader("Task Progress Breakdown")
-st.plotly_chart(fig2, use_container_width=True)
+    st.info("Apply to tasks to generate dashboard insights.")
