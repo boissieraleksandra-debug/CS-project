@@ -5,6 +5,7 @@ st.set_page_config(page_title="Startup Profile", page_icon="🏢", layout="wide"
 init_db()
 
 if st.session_state.get("role") != "startup":
+    st.warning("Please go to the home page and choose Startup first.")
     st.stop()
 
 st.title("🏢 Startup Profile")
