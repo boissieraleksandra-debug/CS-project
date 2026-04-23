@@ -5,14 +5,19 @@ st.set_page_config(page_title="Startup Dashboard", page_icon="📈", layout="wid
 init_db()
 
 if st.session_state.get("role") != "startup":
+    st.warning("Please go to the home page and choose Startup first.")
     st.stop()
 
 startup_name = st.session_state.get("startup_name", "")
 
+st.title("📈 Startup Dashboard")
+
+if not startup_name:
+    st.info("Please save your startup profile first.")
+    st.stop()
+
 tasks = get_tasks_for_startup(startup_name)
 apps = get_applications_for_startup(startup_name)
-
-st.title("📈 Startup Dashboard")
 
 col1, col2, col3 = st.columns(3)
 col1.metric("Posted Tasks", len(tasks))
