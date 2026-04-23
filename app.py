@@ -125,30 +125,8 @@ st.markdown("""
         margin-right: 8px;
         margin-bottom: 8px;
     }
-
-    .sidebar-note {
-        background: #FFFFFF;
-        border: 1px solid #E8ECF4;
-        border-radius: 18px;
-        padding: 14px;
-        font-size: 13px;
-        color: #6B7280;
-        margin-top: 10px;
-    }
 </style>
 """, unsafe_allow_html=True)
-
-with st.sidebar:
-    st.markdown("## 🚀 SkillSwipe")
-    st.markdown(
-        """
-        <div class="sidebar-note">
-            Explore your profile, discover startup tasks, save the ones you like,
-            and track your progress through simple dashboards.
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
 
 st.markdown("""
 <div class="hero-card">
@@ -222,13 +200,5 @@ st.markdown("""
 <span class="pill">Operations</span>
 """, unsafe_allow_html=True)
 
-st.markdown("""
-<div class="soft-card" style="margin-top:18px;">
-    <div class="feature-title">How to navigate</div>
-    <div class="feature-text">
-        Use the sidebar to open your profile, discover startup tasks, view liked jobs,
-        and explore the student and startup dashboards.
-    </div>
-</div>
-""", unsafe_allow_html=True)
+st.info("Use the sidebar to open Profile, Discover Jobs, Liked Jobs, and the dashboards.")
 
