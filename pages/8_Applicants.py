@@ -11,6 +11,7 @@ st.set_page_config(page_title="Applicants", page_icon="📥", layout="wide")
 init_db()
 
 if st.session_state.get("role") != "startup":
+    st.warning("Please go to the home page and choose Startup first.")
     st.stop()
 
 if "show_cancel_for" not in st.session_state:
@@ -19,6 +20,10 @@ if "show_cancel_for" not in st.session_state:
 startup_name = st.session_state.get("startup_name", "")
 
 st.title("📥 Applicants")
+
+if not startup_name:
+    st.info("Please save your startup profile first.")
+    st.stop()
 
 applications = get_applications_for_startup(startup_name)
 
