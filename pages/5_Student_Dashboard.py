@@ -1,43 +1,24 @@
 import streamlit as st
-from db import init_db, get_applications_for_student, update_application_status, submit_work
+from db import init_db, get_applications_for_student, get_saved_task_ids
 
-st.set_page_config(page_title="Task Progress", page_icon="🧩", layout="wide")
+st.set_page_config(page_title="Student Dashboard", page_icon="📊", layout="wide")
 init_db()
 
 if st.session_state.get("role") != "student":
+    st.warning("Please go to the home page and choose Student first.")
     st.stop()
 
 student_name = st.session_state.get("student_name", "")
-
-st.title("🧩 Task Progress")
-
 apps = get_applications_for_student(student_name)
+saved_ids = get_saved_task_ids()
 
-if not apps:
-    st.info("No tasks yet")
-else:
-    for app in apps:
-        st.markdown(f"""
-        ### {app['task_title']}
-        🏢 {app['startup_name']}  
-        **Status:** {app['status']}  
-        **Details:** {app['task_details'] or '-'}  
-        **Submission:** {app['submission_note'] or '-'}  
-        **End reason:** {app['end_reason'] or '-'}
-        """)
+st.title("📊 Student Dashboard")
 
-        if app["status"] == "Matched":
-            if st.button("Start Task", key=f"start_{app['id']}"):
-                update_application_status(app["id"], "In Progress")
-                st.rerun()
+col1, col2, col3 = st.columns(3)
+col1.metric("Saved Tasks", len(saved_ids))
+col2.metric("Applications", len(apps))
+col3.metric("Completed", sum(1 for a in apps if a["status"] == "Completed"))
 
-        if app["status"] == "In Progress":
-            with st.form(f"submit_{app['id']}"):
-                note = st.text_area("Work description")
-                link = st.text_input("Link")
-                if st.form_submit_button("Submit"):
-                    submit_work(app["id"], note, link)
-                    st.success("Submitted")
-                    st.rerun()
-
-        st.divider()
+st.subheader("Task Status Overview")
+for app in apps:
+    st.write(f"- {app['task_title']}: {app['status']}")
