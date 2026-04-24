@@ -24,8 +24,8 @@ else:
         st.markdown(f"""
         ### {task['title']}
         🏢 {task['startup_name']}  
-        📂 {task['category']} | 📍 {task['location']} | ⏳ {task['duration']} | 💰 {task['budget']}  
-        {task['description']}
+        **Category:** {task['category']} | **Location:** {task['location']} | **Duration:** {task['duration']} | **Remuneration:** {task['budget']}  
+        **Description:** {task['description']}
         """)
 
         col1, col2 = st.columns(2)
