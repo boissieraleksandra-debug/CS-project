@@ -1,6 +1,8 @@
-        #this page is the profiling section of the app 
+#this page is the profiling section of the app 
 #====================================================
 import streamlit as st
+import json   # built-in library to read and write JSON files
+import os   # built-in library for handling folders
 #this part means that if no button was chosen the opening page should be shown
 if "role" not in st.session_state:
     st.session_state.role = None
@@ -25,7 +27,7 @@ if st.session_state.role is None:
             st.rerun()
 
 #now we create the opening of the form once the user clicks on the button student
-if st.session_state.role == "student":
+if st.session_state.role == "student" and st.session_state.mode == "edit":
     st.title("🎓 Student Profile")
     
     full_name = st.text_input("Full name")
@@ -79,25 +81,70 @@ if st.session_state.role == "student":
     col_back, col_save_profile = st.columns(2)
 
     with col_back: 
-        if st.button("Back", use_container_width = True):
+        if st.button("Back", use_container_width=True):
             st.session_state.role = None #you forget the chosen role 
             st.session_state.mode = "edit" #reset to edit for next time 
             st.rerun()
     
     #when the user wants to save its profile 
     with col_save_profile: 
-        if st.button("Save Profile", use_container_width = True):
-            st.rerun()
+        if st.button("Save Profile", use_container_width=True):
+            # 0. Make sure the folders exist (create them if missing)
+            os.makedirs("data/photos", exist_ok=True)
+            os.makedirs("data/cvs", exist_ok=True)
+            # 1. Read the existing profiles.json into a Python list
+            with open("data/profiles.json", "r") as f:
+                profiles = json.load(f)
 
-#this is to make sure that the informations are saved 
-    if st.session_state.role == "Save Profile" :   
-        st.session_state.full_name = full_name 
-        st.session_state.LinkedIn = LinkedIn 
-        st.session_state.Education = Education 
-        st.session_state.Interests = Interests 
-        st.session_state.Availability = Availability
-        st.session_state.Photo = Photo 
-        st.session_state.cv_file = cv_file 
+            # 2. Make a unique ID for this new student (e.g. student_1)
+            student_count = len([p for p in profiles if p["role"] == "student"])
+            new_id = f"student_{student_count + 1}"
 
-        st.session_state.mode = "view"
-        st.rerun()
+            # 3. Save the uploaded photo to data/photos/ if one was uploaded
+            photo_path = None
+            if Photo is not None:
+                photo_path = f"data/photos/{new_id}.png"
+                with open(photo_path, "wb") as f:
+                    f.write(Photo.getvalue())
+
+            # 4. Save the uploaded CV to data/cvs/ if one was uploaded
+            cv_path = None
+            if cv_file is not None:
+                cv_path = f"data/cvs/{new_id}.pdf"
+                with open(cv_path, "wb") as f:
+                    f.write(cv_file.getvalue())
+
+            # 5. Build the new profile dictionary
+            new_profile = {
+                "id": new_id,
+                "role": "student",
+                "full_name": full_name,
+                "linkedin": LinkedIn,
+                "education": Education,
+                "interests": Interests,
+                "availability": Availability,
+                "photo_path": photo_path,
+                "cv_path": cv_path,
+            }
+
+            # 6. Append the new profile and write the whole list back to the file
+            profiles.append(new_profile)
+            with open("data/profiles.json", "w") as f:
+                json.dump(profiles, f, indent=2)
+
+            # 7. Also save to session_state for the view page
+            st.session_state.full_name = full_name 
+            st.session_state.LinkedIn = LinkedIn 
+            st.session_state.Education = Education 
+            st.session_state.Interests = Interests 
+            st.session_state.Availability = Availability
+            st.session_state.Photo = Photo 
+            st.session_state.cv_file = cv_file 
+            st.session_state.new_id = new_id
+
+            # 8. Switch to view mode
+            st.session_state.mode = "view"
+            st.rerun() 
+    
+    
+       

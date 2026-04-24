@@ -1,0 +1,17 @@
+[
+  {
+    "id": "student_1",
+    "role": "student",
+    "full_name": "wefkm ",
+    "linkedin": "oievn",
+    "education": "wjfncopsi",
+    "interests": [
+      "Finance",
+      "Design",
+      "Data & Analytics"
+    ],
+    "availability": "10-20 hours / week",
+    "photo_path": "data/photos/student_1.png",
+    "cv_path": "data/cvs/student_1.pdf"
+  }
+]
