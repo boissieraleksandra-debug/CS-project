@@ -2,7 +2,7 @@ import streamlit as st
 #importing only the important features for the code.
 from db import conn, init_db, create_application, save_task_for_student, get_saved_task_ids  
 
-st.set_page_config(page_title="Discover Tasks", page_icon="🔍", layout="wide")
+st.set_page_config(page_title="Discover Tasks", page_icon="", layout="wide")
 #initialise the database. We want to make sure that the database exists before doing anything else
 init_db()
 
