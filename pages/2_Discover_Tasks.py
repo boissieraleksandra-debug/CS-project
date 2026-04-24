@@ -36,7 +36,7 @@ else:
         st.markdown(f"""
         ### {task['title']}
         🏢 {task['startup_name']}  
-        📂 {task['category']} | **Category:** {task['location']} | **Duration:** {task['duration']} | **Remunaration:** {task['budget']}  
+        **Category:** {task['category']} | **Location:** {task['location']} | **Duration:** {task['duration']} | **Remunaration:** {task['budget']}  
         {task['description']}
         """)
 
