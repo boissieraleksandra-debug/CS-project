@@ -1,16 +1,20 @@
 import streamlit as st
-from db import conn, init_db, create_application, save_task_for_student, get_saved_task_ids
+#importing only the important features for the code.
+from db import conn, init_db, create_application, save_task_for_student, get_saved_task_ids  
 
 st.set_page_config(page_title="Discover Tasks", page_icon="🔍", layout="wide")
+#initialise the database. We want to make sure that the database exists before doing anything else
 init_db()
 
-if st.session_state.get("role") != "student":
-    st.warning("Please go to the home page and choose Student first.")
+if st.session_state.get("role") != "student": 
+    #memory box for the participant, it remembers his/her role and where did they click.
+    #use of getter to avoid any error is the value hasn't been set
+    st.warning("Please go to the home page and choose Student first.") #if the user hasn't chosen student as a role, they can't browse the job offers and need to set up a student account.
     st.stop()
 
-st.title("🔍 Discover Tasks")
+st.title("🔍 Discover Tasks") #header
 
-if "apply_task" not in st.session_state:
+if "apply_task" not in st.session_state: #gives the choice to the user to apply or not
     st.session_state.apply_task = None
 
 tasks = conn.execute("SELECT * FROM tasks ORDER BY id DESC").fetchall()
