@@ -37,7 +37,7 @@ else:
         ### {task['title']}
         🏢 {task['startup_name']}  
         **Category:** {task['category']} | **Location:** {task['location']} | **Duration:** {task['duration']} | **Remunaration:** {task['budget']}  
-        {task['description']}
+        **Description:** {task['description']}
         """)
 
         col1, col2 = st.columns(2)
