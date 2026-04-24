@@ -12,7 +12,7 @@ if st.session_state.get("role") != "student":
     st.warning("Please go to the home page and choose Student first.") #if the user hasn't chosen student as a role, they can't browse the job offers and need to set up a student account.
     st.stop()
 
-st.title("🔍 Discover Tasks") #header
+st.title("🌐 Discover Tasks") #header
 
 if "apply_task" not in st.session_state: #gives the choice to the user to apply or not
     st.session_state.apply_task = None
