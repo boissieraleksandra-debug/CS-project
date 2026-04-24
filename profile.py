@@ -146,5 +146,96 @@ if st.session_state.role == "student" and st.session_state.mode == "edit":
             st.session_state.mode = "view"
             st.rerun() 
     
+#Now we're going to do the form for the startups. It's basically the same code or same logic as the form for students 
+if st.session_state.role == "startup" and st.session_state.mode == "edit": 
+    st.title("🚀 Startup Profile")
+    #now we start with the company name and the website which are text box 
+    company_name = st.text_input("Company_name")
+    website = st.text_input("Website")
+    #now we have to write the industry and we want to do a select branch 
+    industry = st.selectbox(
+        "Industry",
+        options =[
+        "Finance", 
+        "Technology", 
+        "Design", 
+        "Legal", 
+        "Human Resources", 
+        "Consulting", 
+        "Sustainability", 
+        "Marketing", 
+        "Data & Analytics", 
+        "other", 
+        ],
+    )
+    #okay now we want a company description
+    descprition = st.text_area(
+        "Short description of the startup", 
+    )
+    #now we want the email 
+    email = st.text_input("Contact email")
+
+    #now we want the logo (same as for the picture for the students)
+    logo = st.file_uploader(
+        "Company logo", 
+        type=["png", "jpg", "jpeg"],
+    )
+    if logo is not None: 
+        st.image(logo, width=150)
+
+    #bottom bar with button "back" and button "save profile"
+    col_back, col_save_profile = st.columns(2)
+
+    with col_back: 
+        if st.button("Back", use_container_width =True, key="startup_back"): 
+            st.session_state.role = None 
+            st.session_state.mode = "edit"
+            st.rerun()
     
+    with col_save_profile:
+        if st.button("Save Profile", use_container_width=True , key = "startup_save_profile"): 
+
+            #now we read the existing profiles.json 
+            with open("data/profiles.json", "r") as f:
+                profiles = json.load(f)
+
+            #make a unique ID for this startup 
+            startup_count = len([p for p in profiles if p["role"] == "startup"])
+            new_id = f"startup_{startup_count + 1}"
+
+            #save the logo to the disk if uploaded 
+            logo_path = None
+            if logo is not None: 
+                logo_path = f"data/photos/{new_id}.png"
+                with open(logo_path, "wb") as f: 
+                    f.write(logo.getvalue())
+
+            #build the new startup profile dictionary 
+            new_profile = {
+                "id": new_id, 
+                "role": "startup", 
+                "website": website, 
+                "industry": industry, 
+                "description": descprition, 
+                "contact_email": email, 
+                "logo_path": logo_path, 
+            }
+
+            #append and write back 
+            profiles.append(new_profile)
+            with open ("data/profiles.json", "w") as f: 
+                json.dump(profiles, f, indent = 2)
+                
+            #save to session_state for the view page 
+            st.session_state.company_name = company_name
+            st.session_state.website = website 
+            st.session_state.industry = industry 
+            st.session_state.descprition = descprition 
+            st.session_state.contact_email = email
+            st.session_state.logo = logo 
+            st.session_state.new_id = new_id
+
+            #switch to view mode 
+            st.session_state.mode = "view"
+            st.rerun()
        

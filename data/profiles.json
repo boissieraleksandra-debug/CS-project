@@ -13,5 +13,56 @@
     "availability": "10-20 hours / week",
     "photo_path": "data/photos/student_1.png",
     "cv_path": "data/cvs/student_1.pdf"
+  },
+  {
+    "id": "startup_1",
+    "role": "startup",
+    "website": "osivnon",
+    "industry": "Finance",
+    "description": "oswicmfnqocinv pINDVOnvfcqNVFwovjn",
+    "contact_email": "ownfcwoifNE@ON F2O",
+    "logo_path": "data/photos/startup_1.png"
+  },
+  {
+    "id": "startup_2",
+    "role": "startup",
+    "website": "osivnon",
+    "industry": "Finance",
+    "description": "oswicmfnqocinv pINDVOnvfcqNVFwovjn",
+    "contact_email": "ownfcwoifNE@ON F2O",
+    "logo_path": "data/photos/startup_2.png"
+  },
+  {
+    "id": "startup_3",
+    "role": "startup",
+    "website": "osivnon",
+    "industry": "Finance",
+    "description": "oswicmfnqocinv pINDVOnvfcqNVFwovjn",
+    "contact_email": "ownfcwoifNE@ON F2O",
+    "logo_path": "data/photos/startup_3.png"
+  },
+  {
+    "id": "startup_4",
+    "role": "startup",
+    "website": "osivnon",
+    "industry": "Finance",
+    "description": "oswicmfnqocinv pINDVOnvfcqNVFwovjn",
+    "contact_email": "ownfcwoifNE@ON F2O",
+    "logo_path": "data/photos/startup_4.png"
+  },
+  {
+    "id": "student_2",
+    "role": "student",
+    "full_name": "awregvwBR",
+    "linkedin": "AEBVEAB",
+    "education": "EB",
+    "interests": [
+      "Design",
+      "Human Resources",
+      "Coding"
+    ],
+    "availability": "10-20 hours / week",
+    "photo_path": "data/photos/student_2.png",
+    "cv_path": "data/cvs/student_2.pdf"
   }
 ]
