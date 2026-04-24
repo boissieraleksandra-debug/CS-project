@@ -18,14 +18,21 @@ if "apply_task" not in st.session_state: #gives the choice to the user to apply 
     st.session_state.apply_task = None
 
 tasks = conn.execute("SELECT * FROM tasks ORDER BY id DESC").fetchall()
-saved_ids = set(get_saved_task_ids())
+#conn. = connecting the database and execute = like placing an order but doesn't give an actual result
+#FROM tasks ORDER BY id DESC = SQL (language for database), * means all columns of data (everything)
+#ORDER BY id DESC = sort the data by their id descending (largest to smallest)
+#Gives back the actual action
+#each task is like a row
+
+saved_ids = set(get_saved_task_ids()) #Having a set is much faster than a list.
 
 if not tasks:
     st.info("No tasks available yet.")
 else:
     for task_row in tasks:
-        task = dict(task_row)
+        task = dict(task_row) #easier to work with dictionaries
 
+        #Better to have markdown because it allows for formating, multiple lines etc
         st.markdown(f"""
         ### {task['title']}
         🏢 {task['startup_name']}  
@@ -35,6 +42,8 @@ else:
 
         col1, col2 = st.columns(2)
 
+        #each button hss to be unique so we use a key as they are unique. It's like giving the buttons an id
+        #Here we prevent dupplicates + save the choice
         with col1:
             if st.button("❤️ Save", key=f"save_{task['id']}"):
                 if task["id"] in saved_ids:
@@ -44,6 +53,7 @@ else:
                     st.success("Task saved.")
                     st.rerun()
 
+        #store the selected apply button
         with col2:
             if st.button("Apply", key=f"apply_{task['id']}"):
                 st.session_state.apply_task = task
@@ -72,8 +82,8 @@ if st.session_state.apply_task is not None:
                 phone,
                 message,
                 cv.name if cv else "No CV"
-            )
-
+            ) # This avoids error in the case there's no cv uploaded
+            
             st.success("Application sent.")
             st.session_state.apply_task = None
             st.rerun()
