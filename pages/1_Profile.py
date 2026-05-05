@@ -22,6 +22,7 @@ import os   # built-in library for handling folders
 from pathlib import Path   # built-in library to handle file paths
 
 # These will link all documents together. it has to appear at the top of most pages 
+import auth
 import ui                                       # sets the theme and the buttons in the sidebar for all pages 
 from db import (                                # this is the database where the profiles will be saved and can be edited
     init_db,
@@ -43,6 +44,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 ) #basically it sets the name of the app and where should it be positioned
 init_db()        # makes sure app.db exists (safe to call every time)
+auth.restore_login()
 ui.load_css()    # applies the purple theme
 ui.sidebar()     # draws the left sidebar (Profile / Discover / Saved / Dashboard)
 
@@ -251,7 +253,7 @@ if st.session_state.role == "student" and st.session_state.mode == "edit":
 
     with col_back:
         if st.button("Back", use_container_width=True):
-            st.session_state.role = None #you forget the chosen role
+            auth.clear_login()
             st.session_state.mode = "edit" #reset to edit for next time
             st.switch_page("app.py") #go back to the landing page (not just rerun, which would blank the screen)
     
@@ -266,8 +268,7 @@ if st.session_state.role == "student" and st.session_state.mode == "edit":
             #if a profile with this email already exists, don't create a new account but just sign back in, also typing your email is enough to go back
             existing = get_student_by_email(email.strip())
             if existing:
-                st.session_state["role"] = "student"
-                st.session_state["student_id"] = existing["id"]
+                auth.persist_login("student", existing["id"])
                 st.session_state.mode = "view" #default to view mode for returning students
                 st.info("Welcome back!")
                 st.switch_page("pages/2_Discovery.py")
@@ -295,8 +296,7 @@ if st.session_state.role == "student" and st.session_state.mode == "edit":
                 (UPLOADS / f"student_{student_id}_photo.png").write_bytes(Photo.getvalue())
 
             #now we need to tell the rest of the app who is logged in. the accounts must appear in the other pages and "on the other side"
-            st.session_state["role"] = "student"
-            st.session_state["student_id"] = student_id
+            auth.persist_login("student", student_id)
             st.session_state.mode = "view" #default to view mode after signup so coming back to Profile shows the saved info
 
             #once you're logged in and everything is saved, you need to receive the welcome email 
@@ -311,4 +311,3 @@ if st.session_state.role == "student" and st.session_state.mode == "edit":
             
             
     
-

@@ -15,6 +15,7 @@ import os
 from pathlib import Path
 
 import streamlit as st
+import auth
 
 try:
     from dotenv import load_dotenv
@@ -102,8 +103,8 @@ def sidebar():
 
         if role:
             if st.button("Log out", use_container_width=True):
-                for k in ("role", "student_id", "startup_id",
-                          "profile_editing", "startup_editing",
+                auth.clear_login()
+                for k in ("profile_editing", "startup_editing", "mode",
                           "expanded_job", "viewing_application_id",
                           "new_job_form_open"):
                     st.session_state.pop(k, None)

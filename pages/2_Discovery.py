@@ -7,12 +7,14 @@ the TF-IDF + cosine recommender in `recommender.py`.
 
 import streamlit as st
 
+import auth
 import ui
 from db import init_db, record_swipe
 from recommender import recommend_jobs
 
 st.set_page_config(page_title="Discover · gigly", page_icon="g", layout="centered", initial_sidebar_state="expanded")
 init_db()
+auth.restore_login()
 ui.load_css()
 ui.sidebar()
 

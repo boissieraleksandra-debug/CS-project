@@ -11,6 +11,7 @@ empty-but-valid database.
 
 import streamlit as st
 
+import auth
 import ui
 from db import init_db
 
@@ -23,6 +24,7 @@ st.set_page_config(
 
 
 init_db()
+auth.restore_login()
 ui.load_css()
 ui.sidebar()
 
@@ -47,7 +49,8 @@ if role == "student" and st.session_state.get("student_id"):
     if st.button("Continue to Discover", type="primary", use_container_width=True):
         st.switch_page("pages/2_Discovery.py")
     if st.button("Log out", use_container_width=True):
-        for k in ("role", "student_id", "startup_id", "profile_editing"):
+        auth.clear_login()
+        for k in ("profile_editing", "mode"):
             st.session_state.pop(k, None)
         st.rerun()
     st.stop()
@@ -57,8 +60,8 @@ if role == "startup" and st.session_state.get("startup_id"):
     if st.button("Continue to Listings", type="primary", use_container_width=True):
         st.switch_page("pages/6_Startup_Listings.py")
     if st.button("Log out", use_container_width=True):
-        for k in ("role", "student_id", "startup_id",
-                  "profile_editing", "startup_editing"):
+        auth.clear_login()
+        for k in ("profile_editing", "startup_editing", "mode"):
             st.session_state.pop(k, None)
         st.rerun()
     st.stop()

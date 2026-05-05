@@ -10,6 +10,7 @@ import streamlit as st
 from pathlib import Path
 
 # The rest that will come is to link everything and make sure it's saved in db: -> this is the code that is also written on the top of the student profile page 
+import auth
 import ui                                       # sets the theme and the buttons in the sidebar for all pages
 from db import (                                # this is the database where the company profiles will be saved and can be edited
     init_db,
@@ -31,6 +32,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 ) #basically it sets the name of the app and where should it be positioned
 init_db()        # makes sure app.db exists (safe to call every time)
+auth.restore_login()
 ui.load_css()    # applies the purple theme
 ui.sidebar()     # draws the left sidebar (Company / Listings / Applicants / Dashboard)
 
@@ -168,8 +170,7 @@ if st.session_state.role == "startup" and st.session_state.mode == "edit":
         if returning_email.strip():
             existing = get_startup_by_email(returning_email.strip())
             if existing:
-                st.session_state["role"] = "startup"
-                st.session_state["startup_id"] = existing["id"]
+                auth.persist_login("startup", existing["id"])
                 st.session_state.mode = "view"
                 st.switch_page("pages/5_Startup_Profile.py")
             else:
@@ -207,7 +208,7 @@ if st.session_state.role == "startup" and st.session_state.mode == "edit":
 
     with col_back:
         if st.button("Back", use_container_width=True, key="startup_back"):
-            st.session_state.role = None #you forget the chosen role
+            auth.clear_login()
             st.session_state.mode = "edit" #reset to edit for next time
             st.switch_page("app.py") #go back to the landing page
 
@@ -222,8 +223,7 @@ if st.session_state.role == "startup" and st.session_state.mode == "edit":
             #if a profile with this email already exists, don't create a new account but just sign back in
             existing = get_startup_by_email(email.strip())
             if existing:
-                st.session_state["role"] = "startup"
-                st.session_state["startup_id"] = existing["id"]
+                auth.persist_login("startup", existing["id"])
                 st.session_state.mode = "view" #default to view mode for returning startups
                 st.info("Welcome back!")
                 st.switch_page("pages/6_Startup_Listings.py")
@@ -246,8 +246,7 @@ if st.session_state.role == "startup" and st.session_state.mode == "edit":
                 update_startup(startup_id, logo_filename=logo_filename)
 
             #now we need to tell the rest of the app who is logged in. the company must appear in the other pages and "on the other side"
-            st.session_state["role"] = "startup"
-            st.session_state["startup_id"] = startup_id
+            auth.persist_login("startup", startup_id)
             st.session_state.mode = "view" #default to view mode after signup so coming back to Company shows the saved info
 
             #once they are logged in and everything is saved, the startup needs to receive the welcome email

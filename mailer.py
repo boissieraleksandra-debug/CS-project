@@ -16,6 +16,7 @@ in the demo regardless of which mode is active.
 """
 
 import os
+from typing import Optional, Tuple
 
 # .env support — silently skip if dotenv isn't installed yet.
 try:
@@ -27,7 +28,7 @@ except ImportError:
 from db import log_email
 
 
-def send_email(to_email: str, subject: str, body: str) -> tuple[bool, str | None]:
+def send_email(to_email: str, subject: str, body: str) -> Tuple[bool, Optional[str]]:
     """Send an email. Returns (ok, error_message).
 
     - In real mode: calls Resend.

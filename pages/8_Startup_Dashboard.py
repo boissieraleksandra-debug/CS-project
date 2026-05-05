@@ -7,6 +7,7 @@ from collections import Counter, defaultdict
 import plotly.express as px
 import streamlit as st
 
+import auth
 import ui
 from db import (
     init_db,
@@ -16,6 +17,7 @@ from db import (
 
 st.set_page_config(page_title="Dashboard · gigly", page_icon="g", layout="centered", initial_sidebar_state="expanded")
 init_db()
+auth.restore_login()
 ui.load_css()
 ui.sidebar()
 

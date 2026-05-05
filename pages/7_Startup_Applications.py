@@ -6,6 +6,7 @@ from urllib.parse import quote
 
 import streamlit as st
 
+import auth
 import ui
 from db import (
     init_db,
@@ -19,6 +20,7 @@ from templates import acceptance_email, rejection_email
 
 st.set_page_config(page_title="Applicants · gigly", page_icon="g", layout="centered", initial_sidebar_state="expanded")
 init_db()
+auth.restore_login()
 ui.load_css()
 ui.sidebar()
 
