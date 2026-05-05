@@ -17,7 +17,7 @@ from db import (
 from mailer import send_email
 from templates import acceptance_email, rejection_email
 
-st.set_page_config(page_title="Applicants · gigly", page_icon="g", layout="centered")
+st.set_page_config(page_title="Applicants · gigly", page_icon="g", layout="centered", initial_sidebar_state="expanded")
 init_db()
 ui.load_css()
 ui.sidebar()

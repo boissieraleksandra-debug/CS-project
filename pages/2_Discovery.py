@@ -11,7 +11,7 @@ import ui
 from db import init_db, record_swipe
 from recommender import recommend_jobs
 
-st.set_page_config(page_title="Discover · gigly", page_icon="g", layout="centered")
+st.set_page_config(page_title="Discover · gigly", page_icon="g", layout="centered", initial_sidebar_state="expanded")
 init_db()
 ui.load_css()
 ui.sidebar()

@@ -353,4 +353,15 @@ hr, [data-testid="stDivider"] {
 footer { visibility: hidden; }
 
 /* ---- Toolbar / deploy button ------------------------------------------ */
-[data-testid="stToolbar"] { display: none; }
+/* (Removed: hiding the toolbar also hid the sidebar's expand toggle.
+   We accept Streamlit's "Deploy" button being visible during local dev.) */
+
+/* ---- Force the sidebar to always be visible --------------------------- */
+/* Some browsers / Streamlit versions auto-collapse the sidebar after a
+   page switch. We override that so the sidebar always renders open. */
+[data-testid="stSidebar"] {
+    display: block !important;
+    visibility: visible !important;
+    transform: none !important;
+    margin-left: 0 !important;
+}

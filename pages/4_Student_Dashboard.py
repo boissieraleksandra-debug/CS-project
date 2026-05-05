@@ -14,7 +14,7 @@ from db import (
     list_liked_jobs,
 )
 
-st.set_page_config(page_title="Dashboard · gigly", page_icon="g", layout="centered")
+st.set_page_config(page_title="Dashboard · gigly", page_icon="g", layout="centered", initial_sidebar_state="expanded")
 init_db()
 ui.load_css()
 ui.sidebar()

@@ -70,13 +70,25 @@ def sidebar():
 
         st.divider()
 
-        from db import list_emails
+        from db import list_emails, get_student, get_startup
         real_mode = bool(os.getenv("RESEND_API_KEY", "").strip())
         mode_label = "Live delivery (Resend)" if real_mode else "Simulated mode"
 
+        # Figure out the current user's email so we only show emails sent
+        # to them. Students and startups are looked up from different tables.
+        user_email = None
+        if role == "student" and st.session_state.get("student_id"):
+            student = get_student(st.session_state["student_id"])
+            if student:
+                user_email = student["email"]
+        elif role == "startup" and st.session_state.get("startup_id"):
+            startup = get_startup(st.session_state["startup_id"])
+            if startup:
+                user_email = startup["email"]
+
         with st.expander("Inbox", expanded=False):
             st.caption(mode_label)
-            emails = list_emails(limit=10)
+            emails = list_emails(limit=10, to_email=user_email)
             if not emails:
                 st.caption("No messages yet.")
             else:

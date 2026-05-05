@@ -427,11 +427,18 @@ def log_email(to_email, subject, body, sent_ok, error=None):
     conn.close()
 
 
-def list_emails(limit=20):
+def list_emails(limit=20, to_email=None):
+    """List recent emails. If to_email is given, only return emails sent to that address."""
     conn = get_conn()
-    rows = conn.execute(
-        "SELECT * FROM emails_log ORDER BY created_at DESC LIMIT ?",
-        (limit,),
-    ).fetchall()
+    if to_email:
+        rows = conn.execute(
+            "SELECT * FROM emails_log WHERE to_email = ? ORDER BY created_at DESC LIMIT ?",
+            (to_email, limit),
+        ).fetchall()
+    else:
+        rows = conn.execute(
+            "SELECT * FROM emails_log ORDER BY created_at DESC LIMIT ?",
+            (limit,),
+        ).fetchall()
     conn.close()
     return rows

@@ -27,7 +27,7 @@ from mailer import send_email
 from templates import signup_confirm_startup
 
 # ---- Page setup ----------------------------------------------------------
-st.set_page_config(page_title="Company · gigly", page_icon="g", layout="centered")
+st.set_page_config(page_title="Company · gigly", page_icon="g", layout="centered", initial_sidebar_state="expanded")
 init_db()
 ui.load_css()
 ui.sidebar()

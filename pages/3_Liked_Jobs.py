@@ -19,7 +19,7 @@ from templates import (
     application_notify_startup,
 )
 
-st.set_page_config(page_title="Saved · gigly", page_icon="g", layout="centered")
+st.set_page_config(page_title="Saved · gigly", page_icon="g", layout="centered", initial_sidebar_state="expanded")
 init_db()
 ui.load_css()
 ui.sidebar()
