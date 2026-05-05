@@ -76,7 +76,7 @@ if st.session_state.role == "startup" and st.session_state.get("startup_id"): #m
         st.session_state.pop("startup_id", None)
     else:
         if st.session_state.mode == "edit":
-            st.title("🚀 Edit your Company Profile")
+            st.title("Edit your Company Profile")
 
             company_name = st.text_input("Company name", value=startup["name"])
             st.markdown(f"Email: {startup['email']} (can't be changed)") #email is the unique key in the db, we don't let users change it
@@ -141,7 +141,7 @@ if st.session_state.role == "startup" and st.session_state.get("startup_id"): #m
 
         # this is when they are on the profile tab of the app in the sidebar and they are viewing the profile + have an edit button
         else:
-            st.title(f"🚀 {startup['name']}")
+            st.title(startup['name'])
             st.caption("This is what students see when you post a role.")
             st.markdown(f"**Industry:**  {startup['industry'] or '—'}")
             st.markdown(f"**Email:**  {startup['email']}")
@@ -159,7 +159,26 @@ if st.session_state.role == "startup" and st.session_state.get("startup_id"): #m
 #now we create the opening of the form once the user clicks on the button startup
 #it's basically the same code or same logic as the form for students
 if st.session_state.role == "startup" and st.session_state.mode == "edit":
-    st.title("🚀 Startup Profile")
+    st.title("Startup Profile")
+
+    # --- Returning startup: sign in by email only ---
+    st.markdown("**Already registered?** Enter your email to sign back in.")
+    returning_email = st.text_input("Your registered email", key="returning_email")
+    if st.button("Sign in", use_container_width=True):
+        if returning_email.strip():
+            existing = get_startup_by_email(returning_email.strip())
+            if existing:
+                st.session_state["role"] = "startup"
+                st.session_state["startup_id"] = existing["id"]
+                st.session_state.mode = "view"
+                st.switch_page("pages/5_Startup_Profile.py")
+            else:
+                st.error("No account found with that email. Fill the form below to create one.")
+        else:
+            st.warning("Please enter your email.")
+
+    st.divider()
+    st.markdown("**New here?** Create your company profile below.")
     #now we start with the company name and the website which are text box
     company_name = st.text_input("Company name")
     website = st.text_input("Website")
@@ -190,7 +209,7 @@ if st.session_state.role == "startup" and st.session_state.mode == "edit":
         if st.button("Back", use_container_width=True, key="startup_back"):
             st.session_state.role = None #you forget the chosen role
             st.session_state.mode = "edit" #reset to edit for next time
-            st.switch_page("app.py") #go back to the landing page
+            st.switch_page("app2.py") #go back to the landing page
 
     #when the startup wants to save its profile
     with col_save_profile:
