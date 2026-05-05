@@ -8,7 +8,7 @@ Two modes, picked automatically:
    (3 000 emails/month) and a 1-line Python SDK.
 
 2. **Simulated** when no API key is set. The email body is written
-   only to the `emails_log` table; the in-app "📬 Inbox" panel inside
+   only to the `emails_log` table; the in-app "Inbox" panel inside
    ui.sidebar() shows them so we can demo without internet.
 
 Either way every send is logged, so we can prove "the app sends emails"

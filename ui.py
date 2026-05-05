@@ -66,7 +66,7 @@ def sidebar():
             st.page_link("pages/7_Startup_Applications.py", label="Applicants")
             st.page_link("pages/8_Startup_Dashboard.py",    label="Dashboard")
         else:
-            st.page_link("app.py", label="Home")
+            st.page_link("app2.py", label="Home")
 
         st.divider()
 
@@ -107,4 +107,4 @@ def sidebar():
                           "expanded_job", "viewing_application_id",
                           "new_job_form_open"):
                     st.session_state.pop(k, None)
-                st.switch_page("app.py")
+                st.switch_page("app2.py")

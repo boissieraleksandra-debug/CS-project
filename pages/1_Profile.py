@@ -73,7 +73,7 @@ if st.session_state.role == "student" and st.session_state.get("student_id"): #m
     else:
         # ===== EDIT MODE: form pre-filled with saved values =====
         if st.session_state.mode == "edit":
-            st.title("🎓 Edit your Profile")
+            st.title("Edit your Profile")
 
             full_name = st.text_input("Full name", value=student["name"])
             st.markdown(f"Email: {student['email']} (can't be changed)") #email is the unique key in the db, we don't let users change it
@@ -173,7 +173,7 @@ if st.session_state.role == "student" and st.session_state.get("student_id"): #m
 
         # ===== VIEW MODE: read-only profile + Edit button =====
         else:
-            st.title("🎓 Your Profile")
+            st.title("Your Profile")
             st.caption("This is what startups see when you apply.")
             st.markdown(f"**Name:**  {student['name']}")
             st.markdown(f"**Email:**  {student['email']}")
@@ -196,7 +196,7 @@ if st.session_state.role == "student" and st.session_state.get("student_id"): #m
 
 #now we create the opening of the form once the user clicks on the button student
 if st.session_state.role == "student" and st.session_state.mode == "edit":
-    st.title("🎓 Student Profile")
+    st.title("Student Profile")
     
     full_name = st.text_input("Full name")
     email = st.text_input ("Email")
@@ -253,7 +253,7 @@ if st.session_state.role == "student" and st.session_state.mode == "edit":
         if st.button("Back", use_container_width=True):
             st.session_state.role = None #you forget the chosen role
             st.session_state.mode = "edit" #reset to edit for next time
-            st.switch_page("app.py") #go back to the landing page (not just rerun, which would blank the screen)
+            st.switch_page("app2.py") #go back to the landing page (not just rerun, which would blank the screen)
     
     #when the user wants to save its profile 
     with col_save_profile: 

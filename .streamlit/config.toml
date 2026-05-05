@@ -2,10 +2,10 @@
 # Streamlit reads this file automatically when you run `streamlit run app.py`.
 
 [theme]
-primaryColor = "#7C3AED"
-backgroundColor = "#FAFAFC"
-secondaryBackgroundColor = "#F3F0FB"
-textColor = "#1B1530"
+primaryColor = "#76238F"
+backgroundColor = "#FCF5FF"
+secondaryBackgroundColor = "#E0BAEC"
+textColor = "#000000"
 font = "sans serif"
 
 [server]
