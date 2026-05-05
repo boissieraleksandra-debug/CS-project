@@ -209,7 +209,7 @@ if st.session_state.role == "startup" and st.session_state.mode == "edit":
         if st.button("Back", use_container_width=True, key="startup_back"):
             st.session_state.role = None #you forget the chosen role
             st.session_state.mode = "edit" #reset to edit for next time
-            st.switch_page("app2.py") #go back to the landing page
+            st.switch_page("app.py") #go back to the landing page
 
     #when the startup wants to save its profile
     with col_save_profile:
