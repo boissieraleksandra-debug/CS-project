@@ -44,7 +44,9 @@ if st.session_state.get("role") != "startup":
     st.session_state["role"] = "startup"
 
 # the part is giving the opportunity to edit their profile 
-if "mode" not in st.session_state:
+if not st.session_state.get("startup_id"):
+    st.session_state.mode = "edit"
+elif "mode" not in st.session_state:
     st.session_state.mode = "edit"
 
 INDUSTRY_OPTIONS = [
