@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.venv/
+venv/
+
+# App data — these are generated locally, not source code
+app.db
+uploads/
+.env
+
+# OS
+.DS_Store

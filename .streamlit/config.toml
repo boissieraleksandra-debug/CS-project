@@ -1,0 +1,18 @@
+# Streamlit configuration: gigly theme.
+# Streamlit reads this file automatically when you run `streamlit run app.py`.
+
+[theme]
+primaryColor = "#7C3AED"
+backgroundColor = "#FAFAFC"
+secondaryBackgroundColor = "#F3F0FB"
+textColor = "#1B1530"
+font = "sans serif"
+
+[server]
+headless = true
+
+# Hide Streamlit's auto-discovered sidebar nav. We render our own
+# role-aware nav in ui.sidebar() so students never see startup pages
+# (and vice versa) without us having to write per-page redirects.
+[client]
+showSidebarNavigation = false
