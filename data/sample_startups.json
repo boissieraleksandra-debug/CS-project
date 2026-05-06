@@ -1,47 +1,47 @@
 [
   {
-    "name": "BrightCart",
-    "email": "hello@brightcart.io",
-    "phone": "+41 44 555 0101",
+    "name": "SparkLane",
+    "email": "hello@sparklane.co",
+    "phone": "+41 44 555 1101",
     "industry": "Marketing",
-    "description": "We help D2C brands build social-first ad campaigns. Small team of 8, based in Zurich.",
-    "website": "https://brightcart.io",
+    "description": "SparkLane is a small growth studio that helps early-stage consumer startups launch faster with paid social, creator campaigns, email funnels, and lightweight creative production.",
+    "website": "https://sparklane.co",
     "logo_filename": null
   },
   {
-    "name": "Latch Labs",
-    "email": "team@latchlabs.dev",
-    "phone": "+41 44 555 0202",
+    "name": "RelayIQ",
+    "email": "build@relayiq.io",
+    "phone": "+41 44 555 2202",
     "industry": "Tech",
-    "description": "Building developer tools for healthcare APIs. Series-A, fully remote.",
-    "website": "https://latchlabs.dev",
+    "description": "RelayIQ builds workflow software for student services teams, with a focus on better onboarding, clearer dashboards, and faster response loops for campus support staff.",
+    "website": "https://relayiq.io",
     "logo_filename": null
   },
   {
-    "name": "Pivotr",
-    "email": "careers@pivotr.com",
-    "phone": "+41 44 555 0303",
+    "name": "LedgerLoop",
+    "email": "team@ledgerloop.ch",
+    "phone": "+41 44 555 3303",
     "industry": "Finance",
-    "description": "Wealth management platform for early-career professionals. 12 people, Zurich + remote.",
-    "website": "https://pivotr.com",
+    "description": "LedgerLoop is an early-stage finance operations platform for small businesses that want cleaner forecasting, better pipeline visibility, and simpler reporting without a full finance team.",
+    "website": "https://ledgerloop.ch",
     "logo_filename": null
   },
   {
-    "name": "Fernpath",
-    "email": "info@fernpath.eco",
-    "phone": "+41 44 555 0404",
+    "name": "Verdant Grid",
+    "email": "hello@verdantgrid.eco",
+    "phone": "+41 44 555 4404",
     "industry": "Sustainability",
-    "description": "Carbon accounting for small businesses. Climate-tech startup, mission-driven.",
-    "website": "https://fernpath.eco",
+    "description": "Verdant Grid helps SMEs understand emissions data, prepare lightweight sustainability reports, and organize climate-related operational work without heavy consulting overhead.",
+    "website": "https://verdantgrid.eco",
     "logo_filename": null
   },
   {
-    "name": "Studio Halfmoon",
-    "email": "hi@halfmoon.studio",
-    "phone": "+41 44 555 0505",
+    "name": "Canvas Pilot",
+    "email": "studio@canvaspilot.design",
+    "phone": "+41 44 555 5505",
     "industry": "Design",
-    "description": "Brand and product design studio working with European fintech and consumer startups.",
-    "website": "https://halfmoon.studio",
+    "description": "Canvas Pilot is a product and presentation design studio that supports startup teams with pitch decks, UX polish, rapid user testing, and practical design system work.",
+    "website": "https://canvaspilot.design",
     "logo_filename": null
   }
 ]

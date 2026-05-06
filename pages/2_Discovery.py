@@ -58,7 +58,12 @@ for job, match_pct, why in ranked:
     with st.container(border=True):
 
         if job["image_url"]:
-            st.image(job["image_url"], use_container_width=True)
+            st.markdown(
+                f"<div class='gigly-job-image-wrap'>"
+                f"<div class='gigly-job-image' style=\"background-image:url('{job['image_url']}')\" aria-label='{job['title']}'></div>"
+                f"</div>",
+                unsafe_allow_html=True,
+            )
 
         head_l, head_r = st.columns([3, 1])
         with head_l:
