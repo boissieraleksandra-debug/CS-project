@@ -10,7 +10,7 @@
   },
   {
     "name": "RelayIQ",
-    "email": "build@relayiq.io",
+    "email": "talent@relayiq.io",
     "phone": "+41 44 555 2202",
     "industry": "Tech",
     "description": "RelayIQ builds workflow software for student services teams, with a focus on better onboarding, clearer dashboards, and faster response loops for campus support staff.",
@@ -19,7 +19,7 @@
   },
   {
     "name": "LedgerLoop",
-    "email": "team@ledgerloop.ch",
+    "email": "careers@ledgerloop.ch",
     "phone": "+41 44 555 3303",
     "industry": "Finance",
     "description": "LedgerLoop is an early-stage finance operations platform for small businesses that want cleaner forecasting, better pipeline visibility, and simpler reporting without a full finance team.",
@@ -28,20 +28,20 @@
   },
   {
     "name": "Verdant Grid",
-    "email": "hello@verdantgrid.eco",
+    "email": "people@verdantgrid.app",
     "phone": "+41 44 555 4404",
     "industry": "Sustainability",
     "description": "Verdant Grid helps SMEs understand emissions data, prepare lightweight sustainability reports, and organize climate-related operational work without heavy consulting overhead.",
-    "website": "https://verdantgrid.eco",
+    "website": "https://verdantgrid.app",
     "logo_filename": null
   },
   {
     "name": "Canvas Pilot",
-    "email": "studio@canvaspilot.design",
+    "email": "hiring@canvaspilot.app",
     "phone": "+41 44 555 5505",
     "industry": "Design",
     "description": "Canvas Pilot is a product and presentation design studio that supports startup teams with pitch decks, UX polish, rapid user testing, and practical design system work.",
-    "website": "https://canvaspilot.design",
+    "website": "https://canvaspilot.app",
     "logo_filename": null
   }
 ]

@@ -39,17 +39,20 @@ st.markdown("# Saved roles")
 st.caption("Gigs you said yes to. Apply when you're ready — we'll email the startup for you.")
 st.write("")
 
-liked = list_liked_jobs(student_id)
-if not liked:
-    st.info(
-        "Nothing saved yet. Open **Discover**, save a few gigs, "
-        "and they'll show up here."
-    )
-    if st.button("Go to Discover", type="primary", use_container_width=True):
-        st.switch_page("pages/2_Discovery.py")
-    st.stop()
 
-for job in liked:
+def send_application_emails(student_id, job_id):
+    student = get_student(student_id)
+    full_job = get_job(job_id)
+    startup = get_startup(full_job["startup_id"])
+
+    subject, body = application_confirm_student(student, full_job, startup)
+    send_email(student["email"], subject, body)
+
+    subject2, body2 = application_notify_startup(student, full_job, startup)
+    send_email(startup["email"], subject2, body2)
+
+
+def render_liked_job(job, student_id):
     with st.container(border=True):
         if job["image_url"]:
             st.markdown(
@@ -71,11 +74,9 @@ for job in liked:
             st.write(job["requirements"])
             st.markdown(f"**Pay:**  {job['pay_rate']}")
 
-        already_applied = bool(job["already_applied"])
-
-        if already_applied:
+        if job["already_applied"]:
             st.success("Applied — we'll email you when the startup decides.")
-            continue
+            return
 
         if st.button("Apply", key=f"apply_{job['id']}",
                      type="primary", use_container_width=True):
@@ -84,15 +85,19 @@ for job in liked:
                 st.warning("Already applied.")
                 st.rerun()
 
-            student = get_student(student_id)
-            full_job = get_job(job["id"])
-            startup = get_startup(full_job["startup_id"])
-
-            subject, body = application_confirm_student(student, full_job, startup)
-            send_email(student["email"], subject, body)
-
-            subject2, body2 = application_notify_startup(student, full_job, startup)
-            send_email(startup["email"], subject2, body2)
-
+            send_application_emails(student_id, job["id"])
             st.toast("Application sent.")
             st.rerun()
+
+liked = list_liked_jobs(student_id)
+if not liked:
+    st.info(
+        "Nothing saved yet. Open **Discover**, save a few gigs, "
+        "and they'll show up here."
+    )
+    if st.button("Go to Discover", type="primary", use_container_width=True):
+        st.switch_page("pages/2_Discovery.py")
+    st.stop()
+
+for job in liked:
+    render_liked_job(job, student_id)

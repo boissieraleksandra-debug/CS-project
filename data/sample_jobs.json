@@ -39,7 +39,7 @@
     "image_url": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80"
   },
   {
-    "startup_email": "build@relayiq.io",
+    "startup_email": "talent@relayiq.io",
     "title": "Landing Page Frontend Fix",
     "short_desc": "Clean up spacing, broken buttons, and form behavior on our main marketing page.",
     "long_desc": "Our marketing site is close, but a few UI issues are hurting conversions. We need someone to fix layout bugs, tighten responsive spacing, and make sure the lead form and CTA buttons behave consistently across desktop and mobile. The work is scoped and ready to hand off.",
@@ -52,7 +52,7 @@
     "image_url": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80"
   },
   {
-    "startup_email": "build@relayiq.io",
+    "startup_email": "talent@relayiq.io",
     "title": "Mobile Responsiveness QA Sprint",
     "short_desc": "Test our student dashboard on phones and tablets and log reproducible UI issues.",
     "long_desc": "We are shipping a new dashboard and want one focused testing sprint before release. You will run through key flows on different viewport sizes, capture screenshots, write clean bug reports, and retest fixes as they land. This is a great role for someone detail-oriented who likes finding edge cases.",
@@ -65,7 +65,7 @@
     "image_url": "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=1200&q=80"
   },
   {
-    "startup_email": "build@relayiq.io",
+    "startup_email": "talent@relayiq.io",
     "title": "Junior Analytics Assistant",
     "short_desc": "Help us clean event data and build weekly product usage summaries.",
     "long_desc": "You will support our product team by checking event tracking quality, cleaning simple exports, and preparing a weekly report on user activation and retention. We are looking for someone who is comfortable with messy data and excited to learn how product analytics works inside an early-stage SaaS startup.",
@@ -78,7 +78,7 @@
     "image_url": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80"
   },
   {
-    "startup_email": "team@ledgerloop.ch",
+    "startup_email": "careers@ledgerloop.ch",
     "title": "Simple Financial Forecast Builder",
     "short_desc": "Turn our assumptions into a 12-month cash flow and revenue model.",
     "long_desc": "We have the business assumptions and need a student to translate them into a clean forecasting model for our next investor update. You will build a simple but readable sheet covering revenue, hiring, software spend, and runway, then walk the founders through how to update it later.",
@@ -91,7 +91,7 @@
     "image_url": "https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=1200&q=80"
   },
   {
-    "startup_email": "team@ledgerloop.ch",
+    "startup_email": "careers@ledgerloop.ch",
     "title": "CRM Data Cleanup Gig",
     "short_desc": "Organize duplicate leads, tags, and notes in our sales pipeline.",
     "long_desc": "Our CRM is messy after a busy fundraising and sales month. We need help cleaning duplicate entries, standardizing stages, filling missing fields, and producing a short handover note on what changed. It is straightforward work but important for the whole team.",
@@ -104,7 +104,7 @@
     "image_url": "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80"
   },
   {
-    "startup_email": "team@ledgerloop.ch",
+    "startup_email": "careers@ledgerloop.ch",
     "title": "Business Development Intern",
     "short_desc": "Research leads, prep outreach lists, and support early partnership conversations.",
     "long_desc": "You will work with our founder on weekly business development tasks including researching potential partners, structuring lead lists, drafting outreach notes, and joining selected intro calls. The role is hands-on and well suited to a student interested in startup sales or partnerships.",
@@ -117,7 +117,7 @@
     "image_url": "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80"
   },
   {
-    "startup_email": "hello@verdantgrid.eco",
+    "startup_email": "people@verdantgrid.app",
     "title": "Sustainability Report Draft Assistant",
     "short_desc": "Help compile our first lightweight impact report for SME customers and partners.",
     "long_desc": "We are preparing a simple impact report and need support pulling together case studies, metrics, and visual structure into a draft that the founder can polish. You will gather source material, summarize findings, and turn rough notes into a coherent first version.",
@@ -130,7 +130,7 @@
     "image_url": "https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?auto=format&fit=crop&w=1200&q=80"
   },
   {
-    "startup_email": "hello@verdantgrid.eco",
+    "startup_email": "people@verdantgrid.app",
     "title": "Competitor Research Analyst",
     "short_desc": "Map the climate software tools our target customers are currently comparing.",
     "long_desc": "We need a fast-moving research sprint on competitors in carbon accounting and sustainability reporting. You will compare pricing, positioning, features, and customer segments, then summarize the findings in a decision-ready table and short presentation for the team.",
@@ -143,7 +143,7 @@
     "image_url": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80"
   },
   {
-    "startup_email": "hello@verdantgrid.eco",
+    "startup_email": "people@verdantgrid.app",
     "title": "Carbon Data Operations Assistant",
     "short_desc": "Support our team with emissions data entry, QA checks, and customer spreadsheet cleanup.",
     "long_desc": "You will help our climate operations lead maintain clean emissions datasets and customer uploads. Tasks include checking units, spotting missing values, standardizing spreadsheet formats, and preparing uploads for review. It is a practical operations role with a sustainability angle.",
@@ -156,7 +156,7 @@
     "image_url": "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=1200&q=80"
   },
   {
-    "startup_email": "studio@canvaspilot.design",
+    "startup_email": "hiring@canvaspilot.app",
     "title": "Pitch Deck Designer",
     "short_desc": "Turn rough founder notes into a clean 12-slide investor deck for meetings next week.",
     "long_desc": "A founder we support has the story but not the visuals. We need a student designer to help structure slides, clean up hierarchy, tighten charts, and make the deck feel credible and modern without overdesigning it. The sprint is quick and feedback cycles will be fast.",
@@ -169,7 +169,7 @@
     "image_url": "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80"
   },
   {
-    "startup_email": "studio@canvaspilot.design",
+    "startup_email": "hiring@canvaspilot.app",
     "title": "User Testing Support Coordinator",
     "short_desc": "Recruit participants, schedule sessions, and organize notes for a usability test week.",
     "long_desc": "We are running a short user testing cycle for a client and need help with logistics and documentation. You will coordinate participant outreach, confirm slots, prepare the session tracker, and consolidate observations after each call so the product team can move fast.",
@@ -182,7 +182,7 @@
     "image_url": "https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=1200&q=80"
   },
   {
-    "startup_email": "studio@canvaspilot.design",
+    "startup_email": "hiring@canvaspilot.app",
     "title": "Product Design Intern",
     "short_desc": "Support wireframes, UI cleanups, and small design system tasks across client work.",
     "long_desc": "You will join our small design team for short, focused product design work across two startup clients. Expect a mix of wireframing, responsive UI polish, component cleanup, and feedback rounds with senior designers. Great role for a student who wants real product design reps.",

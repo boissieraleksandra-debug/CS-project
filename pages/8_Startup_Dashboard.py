@@ -2,8 +2,6 @@
 8_Startup_Dashboard.py — Startup status & insights.
 """
 
-from collections import Counter, defaultdict
-
 import plotly.express as px
 import streamlit as st
 
@@ -30,6 +28,73 @@ if st.session_state.get("role") != "startup" or not st.session_state.get("startu
 
 startup_id = st.session_state["startup_id"]
 
+JOB_STATUS_PILL = {
+    "open":        ("open",        "Open"),
+    "in_progress": ("in_progress", "In progress"),
+    "done":        ("done",        "Done"),
+}
+
+APP_STATUS_PILL = {
+    "pending":   ("pending",   "Pending"),
+    "accepted":  ("accepted",  "Accepted (in progress)"),
+    "declined":  ("declined",  "Declined"),
+    "completed": ("completed", "Completed"),
+}
+
+
+def count_pending_and_accepted(apps):
+    pending = 0
+    accepted = 0
+    for app in apps:
+        if app["status"] == "pending":
+            pending += 1
+        if app["status"] == "accepted":
+            accepted += 1
+    return pending, accepted
+
+
+def count_apps_by_job_id(apps):
+    counts = {}
+    for app in apps:
+        job_id = app["job_id"]
+        counts[job_id] = counts.get(job_id, 0) + 1
+    return counts
+
+
+def build_listing_chart_data(jobs, apps_by_job_id):
+    chart_data = []
+    for job in jobs:
+        title = job["title"]
+        if len(title) > 30:
+            title = title[:30] + "…"
+        chart_data.append(
+            {
+                "job": title,
+                "applications": apps_by_job_id.get(job["id"], 0),
+            }
+        )
+    return chart_data
+
+
+def group_apps_by_job(apps):
+    grouped = {}
+    for app in apps:
+        job_id = app["job_id"]
+        if job_id not in grouped:
+            grouped[job_id] = []
+        grouped[job_id].append(app)
+    return grouped
+
+
+def group_apps_by_status(apps):
+    grouped = {}
+    for app in apps:
+        status = app["status"]
+        if status not in grouped:
+            grouped[status] = []
+        grouped[status].append(app)
+    return grouped
+
 st.markdown("# Dashboard")
 st.caption("Listings and applicants at a glance.")
 st.write("")
@@ -40,8 +105,7 @@ apps = list_applications_for_startup(startup_id)
 # ---- KPI tiles -----------------------------------------------------------
 total_jobs    = len(jobs)
 total_apps    = len(apps)
-pending_apps  = sum(1 for a in apps if a["status"] == "pending")
-accepted_apps = sum(1 for a in apps if a["status"] == "accepted")
+pending_apps, accepted_apps = count_pending_and_accepted(apps)
 
 c1, c2, c3, c4 = st.columns(4)
 c1.metric("Listings",   total_jobs)
@@ -54,14 +118,8 @@ st.write("")
 # ---- Bar chart: applications per listing --------------------------------
 if jobs:
     st.markdown("### Applications per listing")
-    apps_by_job_id = Counter(a["job_id"] for a in apps)
-    chart_data = [
-        {
-            "job": (j["title"][:30] + "…") if len(j["title"]) > 30 else j["title"],
-            "applications": apps_by_job_id.get(j["id"], 0),
-        }
-        for j in jobs
-    ]
+    apps_by_job_id = count_apps_by_job_id(apps)
+    chart_data = build_listing_chart_data(jobs, apps_by_job_id)
     fig = px.bar(
         chart_data,
         x="job",
@@ -83,33 +141,17 @@ if jobs:
 st.write("")
 
 # ---- Per-job detailed breakdown -----------------------------------------
-JOB_STATUS_PILL = {
-    "open":        ("open",        "Open"),
-    "in_progress": ("in_progress", "In progress"),
-    "done":        ("done",        "Done"),
-}
-APP_STATUS_PILL = {
-    "pending":   ("pending",   "Pending"),
-    "accepted":  ("accepted",  "Accepted (in progress)"),
-    "declined":  ("declined",  "Declined"),
-    "completed": ("completed", "Completed"),
-}
-
 st.markdown("### Per-listing breakdown")
 
 if not jobs:
     st.info("Post your first role from the Listings page to see status here.")
     st.stop()
 
-apps_by_job = defaultdict(list)
-for a in apps:
-    apps_by_job[a["job_id"]].append(a)
+apps_by_job = group_apps_by_job(apps)
 
 for job in jobs:
     job_apps = apps_by_job.get(job["id"], [])
-    by_status = defaultdict(list)
-    for a in job_apps:
-        by_status[a["status"]].append(a)
+    by_status = group_apps_by_status(job_apps)
 
     with st.container(border=True):
         head_l, head_r = st.columns([3, 1])

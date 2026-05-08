@@ -77,6 +77,8 @@ for job, match_pct, why in ranked:
 
         st.markdown(f"### {job['title']}")
         st.caption(f"{job['location']}  ·  {job['duration']}")
+        if job["startup_email"]:
+            st.caption(f"Company email: {job['startup_email']}")
 
         if why:
             st.caption(f"_Matches your: {', '.join(why)}_")

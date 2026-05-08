@@ -22,21 +22,76 @@ from db import (
     init_db,
     get_conn,
     create_startup,
+    update_startup,
     get_startup_by_email,
+    get_startup_by_name,
     create_job,
 )
 
 DATA_DIR = Path(__file__).parent / "data"
+STARTUP_INDUSTRIES = {"marketing", "tech", "design", "sustainability"}
+CORPORATE_INDUSTRIES = {"finance", "operations", "business development", "data / analytics"}
+STARTUP_DEFAULTS = {
+    "marketing": ("hello", "co"),
+    "tech": ("talent", "io"),
+    "design": ("hiring", "app"),
+    "sustainability": ("people", "app"),
+}
+CORPORATE_DEFAULTS = {
+    "finance": ("careers", "ch"),
+    "operations": ("hr", "com"),
+    "business development": ("recruiting", "com"),
+    "data / analytics": ("careers", "ai"),
+}
+FALLBACK_STARTUP = ("hello", "app")
+FALLBACK_CORPORATE = ("careers", "com")
 
 
 def load_json(name):
     return json.loads((DATA_DIR / name).read_text(encoding="utf-8"))
 
 
+def _company_slug(name):
+    return "".join(ch for ch in name.lower() if ch.isalnum() or ch == "-")
+
+
+def _startup_email(name, industry):
+    industry_key = (industry or "").strip().lower()
+    slug = _company_slug(name)
+    if industry_key in CORPORATE_INDUSTRIES:
+        prefix, tld = CORPORATE_DEFAULTS.get(industry_key, FALLBACK_CORPORATE)
+    else:
+        prefix, tld = STARTUP_DEFAULTS.get(industry_key, FALLBACK_STARTUP)
+    return f"{prefix}@{slug}.{tld}"
+
+
+def _website(name, industry):
+    return "https://" + _startup_email(name, industry).split("@", 1)[1]
+
+
+def normalize_startup_contact(startup):
+    startup = dict(startup)
+    startup["email"] = _startup_email(startup["name"], startup.get("industry"))
+    startup["website"] = _website(startup["name"], startup.get("industry"))
+    return startup
+
+
 def seed_startups():
-    for s in load_json("sample_startups.json"):
-        if get_startup_by_email(s["email"]):
-            continue                                        # already there
+    for raw_startup in load_json("sample_startups.json"):
+        s = normalize_startup_contact(raw_startup)
+        existing = get_startup_by_name(s["name"]) or get_startup_by_email(s["email"])
+        if existing:
+            update_startup(
+                existing["id"],
+                email=s["email"],
+                phone=s.get("phone"),
+                industry=s.get("industry"),
+                description=s.get("description"),
+                website=s.get("website"),
+                logo_filename=s.get("logo_filename"),
+            )
+            print(f"  ~ startup: {s['name']}")
+            continue
         create_startup(
             name=s["name"],
             email=s["email"],

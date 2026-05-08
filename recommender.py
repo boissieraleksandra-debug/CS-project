@@ -60,6 +60,11 @@ def _student_text(student):
     ])
 
 
+def _match_percent(score: float) -> int:
+    """Turn a cosine score into a UI-friendly 1..99 percentage."""
+    return max(1, min(99, round(score * 100)))
+
+
 def recommend_jobs(student_id: int, max_results: int = 8):
     """Return [(job, match_pct, why_terms), ...] sorted by predicted match.
 
@@ -137,8 +142,7 @@ def recommend_jobs(student_id: int, max_results: int = 8):
 
     results = []
     for idx in order:
-        pct = int(round(float(scores[idx]) * 100))
-        pct = max(1, min(99, pct))                          # never a flat 0 or 100
+        pct = _match_percent(float(scores[idx]))
         job_vec = np.asarray(job_matrix[idx].todense()).ravel()
         overlap = student_vec_for_why * job_vec
         why = []

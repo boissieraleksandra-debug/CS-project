@@ -190,6 +190,13 @@ def get_startup_by_email(email):
     return row
 
 
+def get_startup_by_name(name):
+    conn = get_conn()
+    row = conn.execute("SELECT * FROM startups WHERE name = ?", (name,)).fetchone()
+    conn.close()
+    return row
+
+
 def get_startup(startup_id):
     conn = get_conn()
     row = conn.execute("SELECT * FROM startups WHERE id = ?", (startup_id,)).fetchone()
