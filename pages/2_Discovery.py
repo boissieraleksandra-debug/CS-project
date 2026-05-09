@@ -54,7 +54,7 @@ if not ranked:
 expanded_job_id = st.session_state.get("expanded_job")
 
 # ---- Render each card ---------------------------------------------------
-for job, match_pct, why in ranked:
+for job, _, why in ranked:
     with st.container(border=True):
 
         if job["image_url"]:
@@ -65,15 +65,7 @@ for job, match_pct, why in ranked:
                 unsafe_allow_html=True,
             )
 
-        head_l, head_r = st.columns([3, 1])
-        with head_l:
-            st.caption(f"{job['startup_name']}  ·  {job['industry']}")
-        with head_r:
-            st.markdown(
-                f"<div style='text-align:right'>"
-                f"<span class='score-pill'>{match_pct}% match</span></div>",
-                unsafe_allow_html=True,
-            )
+        st.caption(f"{job['startup_name']}  ·  {job['industry']}")
 
         st.markdown(f"### {job['title']}")
         st.caption(f"{job['location']}  ·  {job['duration']}")
