@@ -77,6 +77,20 @@ if st.session_state.role == "student" and st.session_state.get("student_id"): #m
         if st.session_state.mode == "edit":
             st.title("Edit your Profile")
 
+            st.markdown("**Already registered?** Enter your email to sign back in.")
+            returning_email = st.text_input("Your registered email", key="returning_email")
+            if st.button("Sign in", use_container_width=True):
+                if returning_email.strip():
+                    existing = get_student_by_email(returning_email.strip())
+                    if existing:
+                        auth.persist_login("student", existing["id"])
+                        st.session_state.mode = "view"
+                        st.switch_page("pages/1_Profile.py")
+                    else:
+                        st.error("No account found with that email. Fill the form below to create one.")
+                else:
+                    st.warning("Please enter your email.")
+
             full_name = st.text_input("Full name", value=student["name"])
             st.markdown(f"Email: {student['email']} (can't be changed)") #email is the unique key in the db, we don't let users change it
 
@@ -199,7 +213,26 @@ if st.session_state.role == "student" and st.session_state.get("student_id"): #m
 #now we create the opening of the form once the user clicks on the button student
 if st.session_state.role == "student" and st.session_state.mode == "edit":
     st.title("Student Profile")
-    
+
+    # ===== Email sign-in for returning students =====
+    st.markdown("**Already registered?** Enter your email to sign back in.")
+    returning_email = st.text_input("Your registered email", key="returning_email_signup")
+    if st.button("Sign in", use_container_width=True, key="signin_existing"):
+        if returning_email.strip():
+            existing = get_student_by_email(returning_email.strip())
+            if existing:
+                auth.persist_login("student", existing["id"])
+                st.session_state.mode = "view"
+                st.switch_page("pages/1_Profile.py")
+            else:
+                st.error("No account found with that email. Fill the form below to create one.")
+        else:
+            st.warning("Please enter your email.")
+
+    st.divider()
+
+    st.markdown("**New here?** Create your student profile below.")
+
     full_name = st.text_input("Full name")
     email = st.text_input ("Email")
 #second part of the form because we ask for the linkedin and university (same structure as name because we want the user to fill it out completely) and needs to be on the same allignment as the full name because it is part of the if statement 
