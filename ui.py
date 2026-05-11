@@ -1,52 +1,36 @@
-"""
-ui.py — small UI helpers reused on every page.
+#ui.py centralises what every page needs visually so that changing the sidebar or stylesheet in one place automatically updates the whole app.
 
-- load_css(): inject our custom stylesheet.
-- industry_class(): map an industry name to a CSS class slug.
-- sidebar(): render the role-aware sidebar — page nav (filtered to
-  the current role), the Inbox panel showing sent emails (with a
-  real / simulated send-mode tag), and a Log-out button.
+import os # for environment variables and file paths
+from pathlib import Path # builds file paths that work on any operating system
 
-We also load `.env` once on import so RESEND_API_KEY is visible to any
-page that calls sidebar(), even if that page never imports mailer.
-"""
-
-import os
-from pathlib import Path
-
-import streamlit as st
+import streamlit as st #for UI
 import auth
+from db import list_emails, get_student, get_startup # database functions to fetch data
 
-try:
+try: # 'try' to prevent the app to crash if dotenv is not installed
     from dotenv import load_dotenv
     load_dotenv()
 except ImportError:
     pass
-
-CSS_PATH = Path(__file__).parent / "static" / "style.css"
+# Load .env so API keys are available or skipped if dotenv isn't installed.
+CSS_PATH = Path(__file__).parent / "static" / "style.css" # build path to stylesheet relative to this file 
 
 
 def load_css():
-    """Inject our stylesheet into the current Streamlit page.
-
-    Call this once near the top of every page (after st.set_page_config).
-    """
     if CSS_PATH.exists():
         css = CSS_PATH.read_text(encoding="utf-8")
         st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
+# This function loads the CSS file and injects it into the Streamlit app using st.markdown(). This allows us to apply our custom styles defined in style.css across the entire app. We use unsafe_allow_html=True to allow raw HTML/CSS injection, which is necessary for this to work.
 
-
-def industry_class(industry: str) -> str:
-    """Map an industry name (e.g. 'Sustainability') to a CSS class slug."""
+def industry_class(industry):
     if not industry:
         return ""
     known = {"marketing", "tech", "finance", "sustainability", "design"}
-    slug = industry.strip().lower()
+    slug = industry.strip().lower() # makes it lowercase and removes extra spaces
     return slug if slug in known else ""
+# Return a CSS class slug for known industries only and unknown industries get no class so they don't break our styling
 
-
-def sidebar():
-    """Render the full role-aware sidebar: nav + inbox + logout."""
+def sidebar(): # these lines open the sidebar and render brand logo at the top 
     role = st.session_state.get("role")
 
     with st.sidebar:
@@ -56,7 +40,7 @@ def sidebar():
             unsafe_allow_html=True,
         )
 
-        if role == "student":
+        if role == "student": # show different navigation links in the sidebar based on the user's role, which we have in session_state. 
             st.page_link("pages/1_Profile.py",           label="Profile")
             st.page_link("pages/2_Discovery.py",         label="Discover")
             st.page_link("pages/3_Liked_Jobs.py",        label="Saved")
@@ -67,17 +51,12 @@ def sidebar():
             st.page_link("pages/7_Startup_Applications.py", label="Applicants")
             st.page_link("pages/8_Startup_Dashboard.py",    label="Dashboard")
         else:
-            st.page_link("app.py", label="Home")
+            st.page_link("app.py", label="Home") # if no role is selected, we just show a link to the home page  (landing page) 
 
         st.divider()
 
-        from db import list_emails, get_student, get_startup
-        real_mode = bool(os.getenv("RESEND_API_KEY", "").strip())
-        mode_label = "Live delivery (Resend)" if real_mode else "Simulated mode"
-
-        # Figure out the current user's email so we only show emails sent
-        # to them. Students and startups are looked up from different tables.
-        user_email = None
+        # show only emails sent to the logged-in user
+        user_email = None # if no user is found, the inbox shows nothing
         if role == "student" and st.session_state.get("student_id"):
             student = get_student(st.session_state["student_id"])
             if student:
@@ -86,6 +65,9 @@ def sidebar():
             startup = get_startup(st.session_state["startup_id"])
             if startup:
                 user_email = startup["email"]
+
+        real_mode = bool(os.getenv("RESEND_API_KEY", "").strip())
+        mode_label = "Live delivery (Resend)" if real_mode else "Simulated mode"
 
         with st.expander("Inbox", expanded=False):
             st.caption(mode_label)
@@ -100,10 +82,13 @@ def sidebar():
                     with st.expander("Read", expanded=False):
                         st.text(e["body"])
                     st.divider()
+        # Collapsible inbox showing last 10 emails for this user.
+        # mode_label shows whether emails are really being sent or just logged. 
 
-        if role:
+        #log out button
+        if role: # only show the logout button if a role is selected (so if the user is logged in)
             if st.button("Log out", use_container_width=True):
-                auth.clear_login()
+                auth.clear_login() # removes the login data
                 for k in ("profile_editing", "startup_editing", "mode",
                           "expanded_job", "viewing_application_id",
                           "new_job_form_open"):
