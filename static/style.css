@@ -12,7 +12,7 @@
     --gigly-primary-deep:   #4F1564;
     --gigly-primary-soft:   #FCF5FF; 
     --gigly-accent:         #E0BAEC;
-    --gigly-bg:             #FCF5FF;
+    --gigly-bg:             #FFFFFF;
     --gigly-surface:        #FFFFFF;
     --gigly-surface-alt:    #E0BAEC;
     --gigly-text:           #000000;
@@ -287,6 +287,7 @@ div[data-testid="stVerticalBlock"] > div[style*="border"] {
 .stMultiSelect > div > div {
     border-radius: 9px !important;
     border-color: var(--gigly-border) !important;
+    background: #FFFFFF !important;
 }
 
 /* Purple border and glow ring when input is active, same as for the buttons to make more appealing*/
