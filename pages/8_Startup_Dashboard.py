@@ -13,21 +13,24 @@ from db import (
     list_applications_for_startup,
 )
 
+# this sets up the dashboard page and loads the shared layout used across the app
 st.set_page_config(page_title="Dashboard · gigly", page_icon="g", layout="centered", initial_sidebar_state="expanded")
 init_db()
 auth.restore_login()
 ui.load_css()
 ui.sidebar()
 
-# ---- Auth guard ---------------------------------------------------------
+# startup-only access check
 if st.session_state.get("role") != "startup" or not st.session_state.get("startup_id"):
     st.warning("Please create your company profile first.")
     if st.button("Go to Company", type="primary", use_container_width=True):
         st.switch_page("pages/5_Startup_Profile.py")
     st.stop()
 
+# here we get the id of the startup that is currently logged in so we can load its jobs and applicants
 startup_id = st.session_state["startup_id"]
 
+# these labels are used to display job status and application status clearly across the whole page
 JOB_STATUS_PILL = {
     "open":        ("open",        "Open"),
     "in_progress": ("in_progress", "In progress"),
@@ -43,6 +46,7 @@ APP_STATUS_PILL = {
 
 
 def count_pending_and_accepted(apps):
+    # this function counts the pending and accepted applications for the top metrics row
     pending = 0
     accepted = 0
     for app in apps:
@@ -54,6 +58,7 @@ def count_pending_and_accepted(apps):
 
 
 def count_apps_by_job_id(apps):
+    # here we count how many applications each job listing received so we can build the chart
     counts = {}
     for app in apps:
         job_id = app["job_id"]
@@ -62,6 +67,7 @@ def count_apps_by_job_id(apps):
 
 
 def build_listing_chart_data(jobs, apps_by_job_id):
+    # this builds the bar chart data and shortens long job titles so the chart stays easy to read
     chart_data = []
     for job in jobs:
         title = job["title"]
@@ -77,6 +83,7 @@ def build_listing_chart_data(jobs, apps_by_job_id):
 
 
 def group_apps_by_job(apps):
+    # here we group applications by job so each listing can show its own applicants
     grouped = {}
     for app in apps:
         job_id = app["job_id"]
@@ -87,6 +94,7 @@ def group_apps_by_job(apps):
 
 
 def group_apps_by_status(apps):
+    # this groups the applications by status inside one job listing, like pending or accepted
     grouped = {}
     for app in apps:
         status = app["status"]
@@ -95,18 +103,23 @@ def group_apps_by_status(apps):
         grouped[status].append(app)
     return grouped
 
+
+# this is the title and short text shown at the top of the startup dashboard
 st.markdown("# Dashboard")
 st.caption("Listings and applicants at a glance.")
 st.write("")
 
+# here we load all jobs and applications linked to this startup from the database
 jobs = list_jobs_for_startup(startup_id)
 apps = list_applications_for_startup(startup_id)
 
-# ---- KPI tiles -----------------------------------------------------------
+# top metrics
+# here we calculate the main numbers shown at the top of the page, like listings and total apps
 total_jobs    = len(jobs)
 total_apps    = len(apps)
 pending_apps, accepted_apps = count_pending_and_accepted(apps)
 
+# this row shows the startup dashboard metrics so the company gets a quick summary first
 c1, c2, c3, c4 = st.columns(4)
 c1.metric("Listings",   total_jobs)
 c2.metric("Total apps", total_apps)
@@ -115,8 +128,9 @@ c4.metric("Accepted",   accepted_apps)
 
 st.write("")
 
-# ---- Bar chart: applications per listing --------------------------------
+# applications per listing chart
 if jobs:
+    # this chart shows how many applications each listing received so the startup can compare its roles
     st.markdown("### Applications per listing")
     apps_by_job_id = count_apps_by_job_id(apps)
     chart_data = build_listing_chart_data(jobs, apps_by_job_id)
@@ -140,19 +154,24 @@ if jobs:
 
 st.write("")
 
-# ---- Per-job detailed breakdown -----------------------------------------
+# detailed breakdown for each listing
+# here we start the section that shows one breakdown card for each listing
 st.markdown("### Per-listing breakdown")
 
 if not jobs:
+    # if the startup has no jobs yet, we show a message and stop here because there is nothing to break down
     st.info("Post your first role from the Listings page to see status here.")
     st.stop()
 
+# here we organize the applications by job before showing the listing cards
 apps_by_job = group_apps_by_job(apps)
 
 for job in jobs:
+    # for each listing, we get its applications and group them by status for an easier overview
     job_apps = apps_by_job.get(job["id"], [])
     by_status = group_apps_by_status(job_apps)
 
+    # this card shows the listing title, its status, and total number of applications
     with st.container(border=True):
         head_l, head_r = st.columns([3, 1])
         with head_l:
@@ -167,13 +186,16 @@ for job in jobs:
             st.caption("apps")
 
         if not job_apps:
+            # if this listing has no applicants yet, we show a simple message inside the card
             st.caption("No applications yet.")
             continue
 
+        # here we separate the applicants into status sections so the startup can review them more easily
         for status_key, (cls, status_label) in APP_STATUS_PILL.items():
             people = by_status.get(status_key, [])
             if not people:
                 continue
             with st.expander(f"{status_label} · {len(people)}"):
+                # inside each section, we show the student name and email for quick contact details
                 for a in people:
                     st.write(f"• **{a['student_name']}** — {a['student_email']}")
