@@ -20,7 +20,6 @@ def job_to_text(job):
         job["industry"] or "",
     ])
 
-#this does this
 def build_training_data(student_id: int):
     """
     Builds training data for logistic regression:
