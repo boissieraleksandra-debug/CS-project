@@ -10,14 +10,17 @@ Usage:
     init_db()                  # safe to call at app start; idempotent
 """
 
-import sqlite3
-from pathlib import Path
+#This file is the one that is directly in relation with the database. 
+# The other pages use this page to use its functions everytime they need to save or retrieve a data. So it acts as an intermediate.
 
-# The database is a single file in the project root. Easy to back up,
-# easy to delete and re-seed for the demo.
+import sqlite3
+from pathlib import Path #tool that locates the files on the computer.
+
+# The database is a single file in the project folder. Easy to back up/copy, delete or reset for demos.
 DB_PATH = Path(__file__).parent / "app.db"
 
-
+#So before the app can read anything from the database, it needs to "open a door to it", like having a connection to it.
+#And we have 2 settings: we can access the data by column name and there's a relationship rule between the tables.
 def get_conn():
     """Return a SQLite connection. Rows are accessible by column name."""
     conn = sqlite3.connect(DB_PATH)
@@ -25,7 +28,10 @@ def get_conn():
     conn.execute("PRAGMA foreign_keys = ON")
     return conn
 
-
+#Here this function creates the tables in the database when the app runs for the first time.
+# The tables are like excel sheets with rows & columns.
+# The IF NOT EXISTS means that there will be no problem if the tables already exist
+#The existing tables won't be overwritten by new ones or anything -> won't crash.
 def init_db():
     """Create all tables if they don't exist. Safe to call multiple times."""
     conn = get_conn()
@@ -108,9 +114,12 @@ def init_db():
     conn.commit()
     conn.close()
 
-
+#swipes recrds everytime a student scrolls trough the jobs and swipes either left or right.
+#applications record everytime a student applies to a job, there's a status and the application cannot be duplicated.
+#emails log: records the email that the app sends.
 # ---------------------------------------------------------------------------
 # Student helpers
+#These functions takes care all info related to students (new profile info, changes, login details with the email & ID -> see if they have already an account)
 # ---------------------------------------------------------------------------
 
 def create_student(name, email, linkedin, cv_filename, education, interests, availability):
@@ -156,6 +165,7 @@ def get_student(student_id):
 
 # ---------------------------------------------------------------------------
 # Startup helpers
+#Same as student helpers but for startups.
 # ---------------------------------------------------------------------------
 
 def create_startup(name, email, phone, industry, description, website, logo_filename=None):
@@ -206,6 +216,8 @@ def get_startup(startup_id):
 
 # ---------------------------------------------------------------------------
 # Job helpers
+#Takes care of all features related to the job listings.
+# So it saves the new jobs and link them to the appropriate startup and gives the job ID.
 # ---------------------------------------------------------------------------
 
 def create_job(startup_id, title, short_desc, long_desc, requirements,
@@ -224,7 +236,7 @@ def create_job(startup_id, title, short_desc, long_desc, requirements,
     conn.close()
     return jid
 
-
+# Saves the changes made to the job listing.
 def update_job(job_id, **fields):
     if not fields:
         return
@@ -235,7 +247,7 @@ def update_job(job_id, **fields):
     conn.commit()
     conn.close()
 
-
+#Groups all jobs with the status "open" + the startups info -> what is used to show the students the available jobs. -> "Discover" page"
 def list_open_jobs():
     """All currently-open jobs joined with their startup info."""
     conn = get_conn()
@@ -249,7 +261,7 @@ def list_open_jobs():
     conn.close()
     return rows
 
-
+#Groups all cards/jobs posted per startup -> what is used to show the startups the jobs they posted and allows them to manage them. -> "Listing" page"
 def list_jobs_for_startup(startup_id):
     conn = get_conn()
     rows = conn.execute(
@@ -259,7 +271,7 @@ def list_jobs_for_startup(startup_id):
     conn.close()
     return rows
 
-
+#Goups the job by ID with some info about the startup
 def get_job(job_id):
     conn = get_conn()
     row = conn.execute(
@@ -275,8 +287,9 @@ def get_job(job_id):
 
 # ---------------------------------------------------------------------------
 # Swipe + application helpers
+# Describes the app's matching system
 # ---------------------------------------------------------------------------
-
+#Records evry interaction and saves whether the students liked ,passed or just viewed the job.
 def record_swipe(student_id, job_id, action):
     """action is one of 'like', 'dislike', 'click'."""
     assert action in ("like", "dislike", "click")
@@ -288,7 +301,7 @@ def record_swipe(student_id, job_id, action):
     conn.commit()
     conn.close()
 
-
+#Categorises the swipes per student 
 def list_swipes(student_id):
     conn = get_conn()
     rows = conn.execute(
@@ -298,7 +311,7 @@ def list_swipes(student_id):
     conn.close()
     return rows
 
-
+#Here all the liked jobs are grouped + there's an indication whether they already applied to the job. -> useful for the likes jobs page
 def list_liked_jobs(student_id):
     """Jobs the student liked, with startup info and an already_applied flag."""
     conn = get_conn()

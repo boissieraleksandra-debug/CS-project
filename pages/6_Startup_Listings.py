@@ -1,13 +1,29 @@
 """
 6_Startup_Listings.py — Startup's "main feed": their own job listings.
 """
+# the page aims to allow the startups to manage the jobs they post. So they can 
+# post new job, edit those already posted and so on. So we begin by importing the external tools we need. 
 
-import hashlib
+ #here we use this to generate a job image. So we turn a job title into an image url. It's a standard library. 
+import hashlib 
 
-import streamlit as st
+#import streamlit to be able to see the results.
+import streamlit as st 
 
+#These are modules created to handle the login & the session logic. So it checks who logged in 
+# or takes care of restoring the session.
 import auth
+
+#Takes care of the visual part/ apprearance of the app.
 import ui
+
+#here instead of importing the whole database file, we import just the functions we need.
+# 1. initialise databse -> setup the database structure the first time the program runs.
+# 2. Inserts a new job that has been created into the database
+#3. With that we can edit a job that has already been created.
+#4. Collect all jobs belonging to a specific startup.
+#5. Give info about the startup profile.
+#6 Give info about the job details.
 from db import (
     init_db,
     create_job,
@@ -16,16 +32,21 @@ from db import (
     get_startup,
     get_job,
 )
+
 from mailer import send_email
 from templates import job_listed_confirm
 
+#The block will run again everytime the page loads or refreshes.
+#It sets up how the browser looks like (the layout, tab, titles etc).
 st.set_page_config(page_title="Listings · gigly", page_icon="g", layout="centered", initial_sidebar_state="expanded")
 init_db()
-auth.restore_login()
+auth.restore_login() #saves the session such that one stays logged in if the page gets refreshed.
 ui.load_css()
 ui.sidebar()
 
 # ---- Auth guard: startups only -----------------------------------------
+#ere the app makes sure that only startups can access this page. So if they don't have a profile set up, then they receive a message redirting them towards the profile page.
+#So they cannot create jobs if they didn't set up a profile. 
 if st.session_state.get("role") != "startup" or not st.session_state.get("startup_id"):
     st.warning("Please create your company profile first.")
     if st.button("Go to Company", type="primary", use_container_width=True):
@@ -35,6 +56,8 @@ if st.session_state.get("role") != "startup" or not st.session_state.get("startu
 startup_id = st.session_state["startup_id"]
 startup = get_startup(startup_id)
 
+#Have some lists/ dico here to not have to retype them all the time. So we have the industries and the job status.
+#The status shows whether the posted job is still running or is in progress (so a student is working on the task) or done.
 INDUSTRY_CHOICES = ["Marketing", "Tech", "Finance", "Sustainability", "Design", "Other"]
 STATUS_CHOICES = [
     ("open",        "Open (accepting applicants)"),
@@ -48,7 +71,9 @@ STATUS_CSS = {
     "done": "done",
 }
 
-
+#Here we made sure that every job card gets a picture. It's based on the job title.
+#It takes a picture from the internet and the same job name will produce the same picture such that if the page 
+# reloads then it's still the same image.
 def _default_image(title: str) -> str:
     """Generate a stable picsum URL from the job title so every job has a photo."""
     h = hashlib.md5(title.encode("utf-8")).hexdigest()[:8]
@@ -56,6 +81,7 @@ def _default_image(title: str) -> str:
 
 
 # ---- Header + new-job toggle -------------------------------------------
+#title Job Listing + ability to create a job by clicking on the + button, which then opens the job form.
 header_l, header_r = st.columns([4, 1])
 with header_l:
     st.markdown("# Listings")
@@ -72,6 +98,10 @@ st.write("")
 
 
 # ---- New-job form (toggled) --------------------------------------------
+#here the startups can create a new job card. they have to fulfill the fields. 
+#The publish button Published is pressed then the required fields are checked (they must be fulfilled). 
+#If correctly fulfilled then the job is saved in the database and the startup will receive a confirmation notification + the page will reload such that the job appears below and the job is saved in the database.
+#Cancel button just closes the form without saving the job.
 if st.session_state.get("new_job_form_open"):
     st.markdown("### Post a new role")
     with st.form("new_job"):
@@ -153,6 +183,8 @@ st.write("")
 
 
 # ---- Existing job listings ---------------------------------------------
+#Here the jobs a startup has already posted appear as card with the details of the jobs like the tags, duration, location etc.
+#Each card has an edit button to edit the job if needed. The changes are then saved into the database and the page reloads to show them directly.
 jobs = list_jobs_for_startup(startup_id)
 
 if not jobs:
