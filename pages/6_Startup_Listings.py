@@ -18,7 +18,7 @@ from db import (
 )
 from mailer import send_email
 from templates import job_listed_confirm
-#test
+
 st.set_page_config(page_title="Listings · gigly", page_icon="g", layout="centered", initial_sidebar_state="expanded")
 init_db()
 auth.restore_login()
