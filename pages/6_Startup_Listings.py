@@ -1,13 +1,29 @@
 """
 6_Startup_Listings.py — Startup's "main feed": their own job listings.
 """
+# the page aims to allow the startups to manage the jobs they post. So they can 
+# post new job, edit those already posted and so on. So we begin by importing the external tools we need. 
 
-import hashlib
+ #here we use this to generate a job image. So we turn a job title into an image url. It's a standard library. 
+import hashlib 
 
-import streamlit as st
+#import streamlit to be able to see the results.
+import streamlit as st 
 
+#These are modules created to handle the login & the session logic. So it checks who logged in 
+# or takes care of restoring the session.
 import auth
+
+#Takes care of the visual part/ apprearance of the app.
 import ui
+
+#here instead of importing the whole database file, we import just the functions we need.
+# 1. initialise databse -> setup the database structure the first time the program runs.
+# 2. Inserts a new job that has been created into the database
+#3. With that we can edit a job that has already been created.
+#4. Collect all jobs belonging to a specific startup.
+#5. Give info about the startup profile.
+#6 Give info about the job details.
 from db import (
     init_db,
     create_job,
