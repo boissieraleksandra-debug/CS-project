@@ -336,7 +336,8 @@ def list_liked_jobs(student_id):
     conn.close()
     return rows
 
-
+#Baiscally this function makes that a student doesn't apply twice (or more) to a specific job. 
+#So instead of crashing, the app will just return None.
 def create_application(student_id, job_id):
     """Insert a pending application; returns id or None if it already exists."""
     conn = get_conn()
@@ -352,7 +353,7 @@ def create_application(student_id, job_id):
     finally:
         conn.close()
 
-
+#Groups all pplications a specific student submitted + adds info about the job and the startup.
 def list_applications_for_student(student_id):
     conn = get_conn()
     rows = conn.execute(
@@ -369,7 +370,7 @@ def list_applications_for_student(student_id):
     conn.close()
     return rows
 
-
+#Groups all applications submitted to the jobs posted by a specific startup + adds info about the job and the student. -> useful for the "Application" page of the startup.
 def list_applications_for_startup(startup_id):
     """All applications across every job this startup has posted."""
     conn = get_conn()
@@ -388,7 +389,7 @@ def list_applications_for_startup(startup_id):
     conn.close()
     return rows
 
-
+#Here it's the same as above but this time it's specific to a specific job rather than for all jobs from a startup.
 def list_applications_for_job(job_id):
     conn = get_conn()
     rows = conn.execute(
@@ -404,7 +405,7 @@ def list_applications_for_job(job_id):
     conn.close()
     return rows
 
-
+# Gets one specific application by its ID with the important info (from student, startup etc)
 def get_application(app_id):
     conn = get_conn()
     row = conn.execute(
@@ -424,7 +425,7 @@ def get_application(app_id):
     conn.close()
     return row
 
-
+#here the status of a job is updated + the time at which it was made.
 def update_application_status(app_id, new_status):
     assert new_status in ("pending", "accepted", "declined", "completed")
     conn = get_conn()
@@ -440,8 +441,10 @@ def update_application_status(app_id, new_status):
 
 # ---------------------------------------------------------------------------
 # Email-log helpers (used by mailer.py)
+#These functions support the emailing system. 
 # ---------------------------------------------------------------------------
 
+#Every emmail sent or attemp to sent an email is recorded here with the details (sender, subject, recipient)etc) + if it succeeded.
 def log_email(to_email, subject, body, sent_ok, error=None):
     conn = get_conn()
     conn.execute(
@@ -452,7 +455,7 @@ def log_email(to_email, subject, body, sent_ok, error=None):
     conn.commit()
     conn.close()
 
-
+#Here the recent emails are recorded and they can be sorted by the recipients' address.
 def list_emails(limit=20, to_email=None):
     """List recent emails. If to_email is given, only return emails sent to that address."""
     conn = get_conn()
