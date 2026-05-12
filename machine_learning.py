@@ -1,5 +1,14 @@
-# machine_learning.py
-# Logistic Regression job preference model (hybrid recommender core)
+"""
+machine_learning.py: Logistic Regression job preference model.
+
+This file is the learning core of the recommender system. It builds
+training data from the student's past swipes, trains a Logistic Regression
+model to predict which jobs they will like, and returns probability scores
+for new unseen jobs.
+
+If the student has fewer than 5 swipes, the model returns None and the
+recommender falls back to the TF-IDF similarity approach in recommender.py.
+"""
 
 import numpy as np
 from sklearn.linear_model import LogisticRegression
