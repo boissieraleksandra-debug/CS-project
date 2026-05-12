@@ -25,8 +25,8 @@ st.set_page_config(
 
 init_db()
 auth.restore_login() #checks if the user was already logged in and restores their session state if so 
-ui.load_css() # load our custom CSS we wrote in page sytle.css
-ui.sidebar() # aplly the sidebar navigation
+ui.load_css() # load our custom CSS we wrote in page style.css
+ui.sidebar() # apply the sidebar navigation
 
 # ---- Hero ---------------------------------------------------------------
 st.markdown( # Render the hero banner using raw HTML so we can apply our visual design, the divider are the one we disigned in the CSS
