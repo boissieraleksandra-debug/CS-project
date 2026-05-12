@@ -98,6 +98,10 @@ st.write("")
 
 
 # ---- New-job form (toggled) --------------------------------------------
+#here the startups can create a new job card. they have to fulfill the fields. 
+#The publish button Published is pressed then the required fields are checked (they must be fulfilled). 
+#If correctly fulfilled then the job is saved in the database and the startup will receive a confirmation notification + the page will reload such that the job appears below and the job is saved in the database.
+#Cancel button just closes the form without saving the job.
 if st.session_state.get("new_job_form_open"):
     st.markdown("### Post a new role")
     with st.form("new_job"):
@@ -179,6 +183,8 @@ st.write("")
 
 
 # ---- Existing job listings ---------------------------------------------
+#Here the jobs a startup has already posted appear as card with the details of the jobs like the tags, duration, location etc.
+#Each card has an edit button to edit the job if needed. The changes are then saved into the database and the page reloads to show them directly.
 jobs = list_jobs_for_startup(startup_id)
 
 if not jobs:
