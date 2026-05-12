@@ -15,6 +15,12 @@ Re-running is safe — existing rows are not duplicated.
 To reset everything: delete app.db, then run this script again.
 """
 
+# 1. Imports and Constants
+
+# Here we import all the necessary tools needed
+# json for readying sample data and Path for working with file paths
+# We also import all the database functions we need to create startups and jobs
+
 import json
 from pathlib import Path
 
@@ -27,6 +33,13 @@ from db import (
     get_startup_by_name,
     create_job,
 )
+
+# This points to the folder, where our sample data is stored
+# We also set up some constants to help with generating startup contact info
+# These lookup tables map each industry to a 
+# realistic email prefix and domain ending,
+# so the seeder can generate convincing fake contact details 
+# for each sample company.
 
 DATA_DIR = Path(__file__).parent / "data"
 STARTUP_INDUSTRIES = {"marketing", "tech", "design", "sustainability"}
@@ -46,14 +59,24 @@ CORPORATE_DEFAULTS = {
 FALLBACK_STARTUP = ("hello", "app")
 FALLBACK_CORPORATE = ("careers", "com")
 
+# 2. Helper functions
+
+# We read the json file and return the data as a Python object
 
 def load_json(name):
     return json.loads((DATA_DIR / name).read_text(encoding="utf-8"))
 
+# Here we convert the startup name into a clean version
+# without spaces or special characters,
+# so it can be used to generate a realistic email address
+# and website URL for each startup, based on their industry and name.
 
 def _company_slug(name):
     return "".join(ch for ch in name.lower() if ch.isalnum() or ch == "-")
 
+# Here comes the actual email generation function,
+# Which uses the industry to look up a realistic email prefix
+# and domain ending, and combines it with the cleaned up company name
 
 def _startup_email(name, industry):
     industry_key = (industry or "").strip().lower()
@@ -64,10 +87,16 @@ def _startup_email(name, industry):
         prefix, tld = STARTUP_DEFAULTS.get(industry_key, FALLBACK_STARTUP)
     return f"{prefix}@{slug}.{tld}"
 
+# Here we build the URL from the email address
+# By taking the domain part of the email
+# and adding "https://" in front of it
 
 def _website(name, industry):
     return "https://" + _startup_email(name, industry).split("@", 1)[1]
 
+# This function takes the raw startup data from the JSON file,
+# generates the email and website, 
+# and returns a new dict with all the info.
 
 def normalize_startup_contact(startup):
     startup = dict(startup)
@@ -75,6 +104,14 @@ def normalize_startup_contact(startup):
     startup["website"] = _website(startup["name"], startup.get("industry"))
     return startup
 
+# 3. Seeding functions
+
+# Here we loop through every startup in the sample data
+# and check if it already exists in the database (matched by email).
+# If it already exists, we update the existing record 
+# with any new information from the JSON file
+# (like phone number, industry, description, website, logo).
+# If it doesn't exist, we create a new record in the database.
 
 def seed_startups():
     for raw_startup in load_json("sample_startups.json"):
@@ -103,10 +140,14 @@ def seed_startups():
         )
         print(f"  + startup: {s['name']}")
 
+# Here we load all job titles already in the database into a set
+# So that we avoid inserting duplicates
+# So for each json file, we skip, if a job with the same title
+# already exists in the database.
+# If the job is new, we look up the startup by email, and if it exists
+# we create a new job record in the database linked to that startup.
 
 def seed_jobs():
-    # Avoid inserting jobs that share a title with an existing one — keeps
-    # the seeder idempotent without needing a unique constraint on title.
     conn = get_conn()
     existing_titles = {row["title"] for row in conn.execute("SELECT title FROM jobs")}
     conn.close()
@@ -133,6 +174,14 @@ def seed_jobs():
         )
         print(f"  + job: {j['title']}")
 
+# 4. Main execution
+
+# This block runs, when you execute this script directly,
+# It initializes the database and runs the seeding functions.
+# And prints done when you're finished
+# You can run this script multiple times without creating duplicates,
+# Thanks to our checks for existing startups and jobs
+# before inserting new records.
 
 if __name__ == "__main__":
     print("Initializing database...")
