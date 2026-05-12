@@ -133,7 +133,7 @@ in_progress = status_counts.get("accepted",  0)
 completed   = status_counts.get("completed", 0)
 
 # this row shows the main dashboard metrics so the student gets a quick overview first
-c1, c2, c3, c4 = st.columns(4)
+c1, c2, c3, c4 = st.columns([1.4, 1.4, 1.4, 1.4])
 c1.metric("Applied",     total)
 c2.metric("Pending",     pending)
 c3.metric("In progress", in_progress)

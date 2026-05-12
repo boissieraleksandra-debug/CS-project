@@ -247,6 +247,12 @@ def update_job(job_id, **fields):
     conn.commit()
     conn.close()
 
+def delete_job(job_id):
+    conn = get_conn()
+    conn.execute("DELETE FROM jobs WHERE id = ?", (job_id,))
+    conn.commit()
+    conn.close()
+
 #Groups all jobs with the status "open" + the startups info -> what is used to show the students the available jobs. -> "Discover" page"
 def list_open_jobs():
     """All currently-open jobs joined with their startup info."""
