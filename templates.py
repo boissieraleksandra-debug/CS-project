@@ -126,5 +126,5 @@ You'll get an email each time a student applies.
     return subject, body
 
 """ on this page we define all the email content and store them as functions that return a subject and body (what to say).
-When something happens in the app (a student applies, a startup accepts,...), the relevant page calls mailer.py, which fetches the right template and connects 
-to Gmail's server to send the actual email.  """
+When something happens in the app (a student applies, a startup accepts,...), the relevant page calls mailer.py, which fetches the right template and sends
+the actual email through Resend when a live API key is configured. """

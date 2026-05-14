@@ -66,8 +66,8 @@ def sidebar(): # these lines open the sidebar and render brand logo at the top
             if startup:
                 user_email = startup["email"]
 
-        real_mode = bool(os.getenv("BREVO_API_KEY", "").strip())
-        mode_label = "Live delivery (Brevo)" if real_mode else "Simulated mode"
+        real_mode = bool(os.getenv("RESEND_API_KEY", "").strip())
+        mode_label = "Live delivery (Resend)" if real_mode else "Simulated mode"
 
         with st.expander("Inbox", expanded=False):
             st.caption(mode_label)
