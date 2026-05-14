@@ -20,7 +20,7 @@ auth.restore_login()
 ui.load_css()
 ui.sidebar()
 
-# ---- Auth guard ---------------------------------------------------------
+# This checks that only students can access
 if st.session_state.get("role") != "student" or not st.session_state.get("student_id"):
     st.warning("Please create your student profile first.")
     if st.button("Go to Profile", type="primary", use_container_width=True):
@@ -156,7 +156,6 @@ st.write("")
 apps = list_applications_for_student(student_id)
 liked = list_liked_jobs(student_id)
 
-# ---- KPI tiles ----------------------------------------------------------
 # here we calculate the numbers we want to show at the top, like applied, pending, and completed 
 total       = len(apps)
 pending, in_progress, declined, completed = count_application_statuses(apps)
@@ -170,7 +169,7 @@ c4.metric("Completed",   completed)
 
 st.write("")
 
-# ---- Donut chart: status breakdown --------------------------------------
+# This creates the Donut chart with the status breakdown 
 if total > 0:
     # this donut chart shows how the applications are split by status, like pending or completed
     st.markdown("### Application status")
@@ -196,7 +195,7 @@ else:
 
 st.write("")
 
-# ---- Bar chart: liked jobs by industry ----------------------------------
+# This create the bar chart for the liked jobs by industry 
 if liked:
     # this chart shows which industries appear most in the saved jobs the student liked
     st.markdown("### Saved roles by industry")
@@ -224,7 +223,6 @@ else:
 
 st.write("")
 
-# ---- Detailed application list ------------------------------------------
 # here we show the full list of applications and their current status under the charts
 st.markdown("### All applications")
 if not apps:
