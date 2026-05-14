@@ -13,6 +13,9 @@ Two modes, picked automatically:
 
 Either way every send is logged.
 """
+#The task of this page is to send emails from an app such that we don't have to have our own domain.
+#We used Brevo as the external email service by creating an API key there. It allows us to send actual emails to the users.
+#If we had to send more than 300 emails per day (limit on Brevo) then the email content would just be saved on the database instead of sending it.
 
 import os
 from typing import Optional, Tuple
@@ -24,9 +27,10 @@ try:
 except ImportError:
     pass
 
-from db import log_email
+from db import log_email #Here it imports the email loggin function from the database such that every attempt is recorded.
 
-
+#This function is called when an email needs to be sent. It gets the recipient's email, the email's subject and the body text.
+#And then it sees if there's an API key otherwise just saves in the db.
 def send_email(to_email: str, subject: str, body: str) -> Tuple[bool, Optional[str]]:
     """Send an email. Returns (ok, error_message)."""
     api_key = os.getenv("BREVO_API_KEY", "").strip()
@@ -34,12 +38,13 @@ def send_email(to_email: str, subject: str, body: str) -> Tuple[bool, Optional[s
     from_name = os.getenv("FROM_NAME", "Gigly").strip()
 
     # ----- Simulated mode -----
-    # If no API key is set, just log to the database and pretend it sent.
+    # If no API key is set, then just log to the database and pretend it sent.
     if not api_key:
         log_email(to_email, subject, body, sent_ok=True, error=None)
         return True, None
 
     # ----- Real send via Brevo -----
+
     try:
         import sib_api_v3_sdk
         from sib_api_v3_sdk.rest import ApiException
