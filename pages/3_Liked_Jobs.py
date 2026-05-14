@@ -13,6 +13,7 @@ from db import (
     get_student,
     get_startup,
     create_application,
+    remove_saved_job,
 )
 from mailer import send_email
 from templates import (
@@ -27,7 +28,7 @@ auth.restore_login()
 ui.load_css()
 ui.sidebar()
 
-# student-only access check
+# ---- Auth guard: students only -----------------------------------------
 if st.session_state.get("role") != "student" or not st.session_state.get("student_id"):
     st.warning("Please create your student profile first.")
     if st.button("Go to Profile", type="primary", use_container_width=True):
@@ -59,7 +60,7 @@ def send_application_emails(student_id, job_id):
 
 
 def render_liked_job(job, student_id):
-    # this function displays one liked job inside a card so the page stays easy to reuse and read
+    # this function displays one saved job card, and it will be used again for each liked job with 
     with st.container(border=True):
         # if the job has an image, we show it at the top of the card to make the listing more visual
         if job["image_url"]:
@@ -76,7 +77,7 @@ def render_liked_job(job, student_id):
         st.caption(f"{job['location']}  ·  {job['duration']}")
         st.write(job["short_desc"])
 
-        # this expandable section shows the full job details without making the main card too long
+        # this expandable section shows the full job details 
         with st.expander("View full description"):
             st.markdown("**About this role**")
             st.write(job["long_desc"])
@@ -84,23 +85,32 @@ def render_liked_job(job, student_id):
             st.write(job["requirements"])
             st.markdown(f"**Pay:**  {job['pay_rate']}")
 
-        # if the student already applied, we show the status message and stop so the Apply button does not appear
-        if job["already_applied"]:
-            st.success("Applied! We'll email you when the startup decides.")
-            return
+        action_l, action_r = st.columns(2)
 
-        # when the student clicks Apply, we save the application in the database for this student and job
-        if st.button("Apply", key=f"apply_{job['id']}",
-                     type="primary", use_container_width=True):
-            app_id = create_application(student_id, job["id"])
-            if app_id is None:
-                st.warning("Already applied.")
+        with action_l:
+            # if the student already applied, we show the status message instead of the Apply button
+            if job["already_applied"]:
+                st.success("Applied! We'll email you when the startup decides.")
+            else:
+                # when the student clicks Apply, we save the application in the database for this student and job
+                if st.button("Apply", key=f"apply_{job['id']}",
+                             type="primary", use_container_width=True):
+                    app_id = create_application(student_id, job["id"])
+                    if app_id is None:
+                        st.warning("Already applied.")
+                        st.rerun()
+
+                    # after saving, we send email notifications to both sides so they know the application was created
+                    send_application_emails(student_id, job["id"])
+                    st.toast("Application sent.")
+                    st.rerun()
+
+        with action_r:
+            # this button removes the job from the saved list without marking it as disliked
+            if st.button("Remove", key=f"remove_{job['id']}", use_container_width=True):
+                remove_saved_job(student_id, job["id"])
+                st.toast("Removed from saved jobs.")
                 st.rerun()
-
-            # after saving, we send email notifications to both sides so they know the application was created
-            send_application_emails(student_id, job["id"])
-            st.toast("Application sent.")
-            st.rerun()
 
 
 # here we load all jobs that this student liked before so we can show them on this page
@@ -115,6 +125,6 @@ if not liked:
         st.switch_page("pages/2_Discovery.py")
     st.stop()
 
-# now we go through the saved jobs list and show one card for each role
+# this loop goes through all liked jobs and uses the function above each time to show the jobs one by one
 for job in liked:
     render_liked_job(job, student_id)

@@ -336,6 +336,17 @@ def list_liked_jobs(student_id):
     conn.close()
     return rows
 
+
+def remove_saved_job(student_id, job_id):
+    """Remove saved-state likes for one student/job pair."""
+    conn = get_conn()
+    conn.execute(
+        "DELETE FROM swipes WHERE student_id = ? AND job_id = ? AND action = 'like'",
+        (student_id, job_id),
+    )
+    conn.commit()
+    conn.close()
+
 #Baiscally this function makes that a student doesn't apply twice (or more) to a specific job. 
 #So instead of crashing, the app will just return None.
 def create_application(student_id, job_id):
