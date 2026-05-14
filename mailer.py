@@ -33,18 +33,18 @@ from db import log_email #Here it imports the email loggin function from the dat
 #And then it sees if there's an API key otherwise just saves in the db.
 def send_email(to_email: str, subject: str, body: str) -> Tuple[bool, Optional[str]]:
     """Send an email. Returns (ok, error_message)."""
+    #the following 3 lines read values from the .env file and look for the API key and returns just an empty str if it doesn't exist instead of crashing out.
     api_key = os.getenv("BREVO_API_KEY", "").strip()
     from_email = os.getenv("FROM_EMAIL", "").strip()
     from_name = os.getenv("FROM_NAME", "Gigly").strip()
 
     # ----- Simulated mode -----
-    # If no API key is set, then just log to the database and pretend it sent.
+    # If no API key is set, then just log to the database and pretend it sent -> sent_ok= true.
     if not api_key:
         log_email(to_email, subject, body, sent_ok=True, error=None)
         return True, None
 
     # ----- Real send via Brevo -----
-
     try:
         import sib_api_v3_sdk
         from sib_api_v3_sdk.rest import ApiException
@@ -68,10 +68,13 @@ def send_email(to_email: str, subject: str, body: str) -> Tuple[bool, Optional[s
         )
 
         # Send and log success
+      
         api_instance.send_transac_email(email)
         log_email(to_email, subject, body, sent_ok=True, error=None)
         return True, None
-
+    
+    #Here, instead of crashing down if the content inside try fails (wrong API or no Intenet for ex) then it jumps to this exception.
+    #If something went wrong, then the error message is stored in e.
     except Exception as e:
         # Send failed — log the error so we can debug
         log_email(to_email, subject, body, sent_ok=False, error=str(e))
