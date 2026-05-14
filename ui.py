@@ -25,7 +25,7 @@ def load_css():
 def industry_class(industry):
     if not industry:
         return ""
-    known = {"marketing", "tech", "finance", "sustainability", "design"}
+    known = {"marketing", "technology", "finance", "sustainability", "design"}
     slug = industry.strip().lower() # makes it lowercase and removes extra spaces
     return slug if slug in known else ""
 # Return a CSS class slug for known industries only and unknown industries get no class so they don't break our styling
