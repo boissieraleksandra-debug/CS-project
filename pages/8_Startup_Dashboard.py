@@ -20,7 +20,7 @@ auth.restore_login()
 ui.load_css()
 ui.sidebar()
 
-# ---- Auth guard ---------------------------------------------------------
+# This checks that only a startup user can access this dashboard
 if st.session_state.get("role") != "startup" or not st.session_state.get("startup_id"):
     st.warning("Please create your company profile first.")
     if st.button("Go to Company", type="primary", use_container_width=True):
@@ -120,7 +120,6 @@ st.write("")
 jobs = list_jobs_for_startup(startup_id)
 apps = list_applications_for_startup(startup_id)
 
-# ---- KPI tiles -----------------------------------------------------------
 # here we calculate the numbers shown at the top of the page, like listings and total applications
 total_jobs    = len(jobs)
 total_apps    = len(apps)
@@ -135,7 +134,7 @@ c4.metric("Accepted",   accepted_apps)
 
 st.write("")
 
-# ---- Bar chart: applications per listing --------------------------------
+# here we create the bar chart for applications per listing 
 if jobs:
     # this chart shows how many applications each listing received so the startup can compare its roles
     st.markdown("### Applications per listing")
@@ -161,7 +160,6 @@ if jobs:
 
 st.write("")
 
-# ---- Per-job detailed breakdown -----------------------------------------------
 # here we start the section that shows one breakdown card for each listing
 st.markdown("### Per-listing breakdown")
 
