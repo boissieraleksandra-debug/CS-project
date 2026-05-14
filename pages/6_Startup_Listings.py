@@ -69,11 +69,12 @@ STATUS_CSS = {
     "done": "done",
 }
 
-#Here we made sure that every job card gets a picture. It's based on the job title.
-#It takes a picture from the internet and the same job name will produce the same picture such that if the page 
+#Here we made sure that every job card gets a picture even if the startup doesn't provide one on its own. It's based on the job title.
+#So if they don't provide a picture, the function will pick a picture that matches the job, according the industry.
 # reloads then it's still the same image.
 def _default_image(title: str, industry: str = "") -> str:
     # Curated Unsplash photo IDs matched to job categories — deterministic, always relevant
+    #Each category is mapped to a specific pcture ID.
     CATEGORY_IMAGES = {
         "software":   "photo-1517694712202-14dd9538aa97",  # laptop with code
         "design":     "photo-1561070791-2526d30994b5",     # design workspace
@@ -91,6 +92,8 @@ def _default_image(title: str, industry: str = "") -> str:
         "video":      "photo-1536240478700-b869ad10e128",  # video / camera
         "default":    "photo-1497366216548-37526070297c",  # modern office
     }
+    #And here, each category has a list of keywords to ensure that the most words are covered and therefore get a picture.
+    #Allows to reload thepage and still have the same picture.
 
     KEYWORDS = {
         "software":   ["software", "engineer", "developer", "coding", "backend", "frontend", "fullstack",
@@ -125,7 +128,7 @@ def _default_image(title: str, industry: str = "") -> str:
         "video":      ["video", "film", "filmmaker", "cinematographer", "editor", "youtube",
                         "production", "multimedia", "podcast", "audio"],
     }
-
+#If no key word matches, then the fall back option is chosen ("default photo").
     t = title.lower()
     for category, kws in KEYWORDS.items():
         if any(kw in t for kw in kws):
@@ -238,8 +241,9 @@ st.write("")
 
 
 # ---- Existing job listings ---------------------------------------------
-#Here the jobs a startup has already posted appear as card with the details of the jobs like the tags, duration, location etc.
+#Here the jobs a startup has already posted, appear as card with the details of the jobs like the tags, duration, location etc.
 #Each card has an edit button to edit the job if needed. The changes are then saved into the database and the page reloads to show them directly.
+#The startup can also decide to delete a job listing.
 jobs = list_jobs_for_startup(startup_id)
 
 if not jobs:
