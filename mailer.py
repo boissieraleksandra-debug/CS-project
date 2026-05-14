@@ -3,16 +3,15 @@ mailer.py — sending the app's transactional emails.
 
 Two modes, picked automatically:
 
-1. **Real send** via Resend (https://resend.com) when RESEND_API_KEY
-   is set in the environment / .env file. Resend has a free tier
-   (3 000 emails/month) and a 1-line Python SDK.
+1. **Real send** via Brevo (https://brevo.com) when BREVO_API_KEY
+   is set in the environment / .env file. Brevo has a free tier
+   (300 emails/day) and works with single-sender verification.
 
 2. **Simulated** when no API key is set. The email body is written
    only to the `emails_log` table; the in-app "Inbox" panel inside
    ui.sidebar() shows them so we can demo without internet.
 
-Either way every send is logged, so we can prove "the app sends emails"
-in the demo regardless of which mode is active.
+Either way every send is logged.
 """
 
 import os
@@ -29,33 +28,46 @@ from db import log_email
 
 
 def send_email(to_email: str, subject: str, body: str) -> Tuple[bool, Optional[str]]:
-    """Send an email. Returns (ok, error_message).
-
-    - In real mode: calls Resend.
-    - In simulated mode: just logs to the database.
-    """
-    api_key = os.getenv("RESEND_API_KEY", "").strip()
-    from_email = os.getenv("FROM_EMAIL", "onboarding@resend.dev").strip()
+    """Send an email. Returns (ok, error_message)."""
+    api_key = os.getenv("BREVO_API_KEY", "").strip()
+    from_email = os.getenv("FROM_EMAIL", "").strip()
+    from_name = os.getenv("FROM_NAME", "Gigly").strip()
 
     # ----- Simulated mode -----
+    # If no API key is set, just log to the database and pretend it sent.
     if not api_key:
         log_email(to_email, subject, body, sent_ok=True, error=None)
         return True, None
 
-    # ----- Real send via Resend -----
+    # ----- Real send via Brevo -----
     try:
-        import resend                                       # imported lazily
-        resend.api_key = api_key
-        # Resend wants HTML; \n -> <br> is enough for our plain-text bodies.
+        import sib_api_v3_sdk
+        from sib_api_v3_sdk.rest import ApiException
+
+        # Configure the API client with our key
+        configuration = sib_api_v3_sdk.Configuration()
+        configuration.api_key['api-key'] = api_key
+        api_instance = sib_api_v3_sdk.TransactionalEmailsApi(
+            sib_api_v3_sdk.ApiClient(configuration)
+        )
+
+        # Brevo wants HTML; convert plain-text \n to <br>
         html_body = body.replace("\n", "<br>\n")
-        resend.Emails.send({
-            "from": from_email,
-            "to": [to_email],
-            "subject": subject,
-            "html": html_body,
-        })
+
+        # Build the email payload
+        email = sib_api_v3_sdk.SendSmtpEmail(
+            to=[{"email": to_email}],
+            sender={"email": from_email, "name": from_name},
+            subject=subject,
+            html_content=html_body,
+        )
+
+        # Send and log success
+        api_instance.send_transac_email(email)
         log_email(to_email, subject, body, sent_ok=True, error=None)
         return True, None
-    except Exception as e:                                  # noqa: BLE001
+
+    except Exception as e:
+        # Send failed — log the error so we can debug
         log_email(to_email, subject, body, sent_ok=False, error=str(e))
         return False, str(e)
