@@ -30,7 +30,7 @@ The app opens at <http://localhost:8501>.
 |---|---|
 | Solves a problem | Two-sided student↔startup match for short gigs |
 | Is an app | Streamlit multi-page web app |
-| API / DB / external data | SQLite database (`app.db`), Resend email API, jobs loaded from `data/sample_jobs.json` |
+| API / DB / external data | SQLite database (`app.db`), Brevo email API, jobs loaded from `data/sample_jobs.json` |
 | Visualization | Plotly donut + bar charts on the dashboards |
 | Machine learning | TF-IDF + cosine similarity recommender that learns from like/dislike history |
 | Documented code | Inline comments + docstrings; this README; `CONTRIBUTORS.md` |
@@ -42,7 +42,7 @@ The app opens at <http://localhost:8501>.
 - **SQLite** — single-file database (`app.db`), zero setup.
 - **scikit-learn** — TF-IDF + cosine similarity for the recommender.
 - **Plotly** — interactive charts.
-- **Resend** — transactional email API (free tier). Falls back to a
+- **Brevo** — transactional email API (free tier). Falls back to a
   simulated in-app inbox if no API key is set.
 
 ## Project layout
@@ -72,8 +72,8 @@ static/style.css             Custom CSS (mobile-style cards)
 ## Configuration
 
 Copy `.env.example` to `.env`. If you want real email sending, sign up
-at [resend.com](https://resend.com) (free), get an API key, and paste
-it into `.env`. If you leave `RESEND_API_KEY` empty, the app simulates
+at [brevo.com](https://brevo.com) (free), get an API key, and paste
+it into `.env`. If you leave `BREVO_API_KEY` empty, the app simulates
 emails: every send is logged to the database and shown in a "📬 Inbox"
 expander on every page. This is what to demo if Wi-Fi is unreliable on
 presentation day.
@@ -115,6 +115,6 @@ rm app.db && python seed.py
 ## Deployment
 
 Push the repo to GitHub, then connect it at
-<https://share.streamlit.io>. Add `RESEND_API_KEY` and `FROM_EMAIL` as
+<https://share.streamlit.io>. Add `BREVO_API_KEY` and `FROM_EMAIL` as
 secrets in the Streamlit Cloud dashboard. The app gets a public URL like
 `https://your-team.streamlit.app`.
