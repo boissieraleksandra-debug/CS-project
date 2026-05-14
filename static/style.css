@@ -244,11 +244,14 @@ div[data-testid="stVerticalBlock"] > div[style*="border"] {
     box-shadow: 0 0 0 3px rgba(118, 35, 143, 0.15) !important;
 }
 
-/* Primary buttons: filled purple. */
+/* Primary buttons: filled purple with white text. */
 .stButton > button[kind="primary"],
-.stButton > button[data-testid="baseButton-primary"] {
+.stButton > button[data-testid="baseButton-primary"],
+.stButton > button[kind="primary"] *,
+.stButton > button[data-testid="baseButton-primary"] * {
     background-color: var(--gigly-primary) !important;
-    color: #FCF5FF !important;
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
     border: none !important;
     font-weight: 600 !important;
     box-shadow: 0 1px 2px rgba(79, 21, 100, 0.2) !important;
@@ -257,8 +260,8 @@ div[data-testid="stVerticalBlock"] > div[style*="border"] {
 .stButton > button[kind="primary"]:hover,
 .stButton > button[data-testid="baseButton-primary"]:hover {
     background-color: #5C1B71 !important;
-    border-color: #5C1B71 !important;
-    color: #FCF5FF !important;
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
 }
 
 /* Form submit buttons. */
@@ -374,13 +377,17 @@ div[data-testid="stVerticalBlock"] > div[style*="border"] {
     margin-bottom: 32px;
 }
 
+/* force all text inside the dark hero to stay white, overriding the global black heading rule */
+.gigly-hero, .gigly-hero * {
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
+}
+
 .gigly-hero-mark {
     font-family: 'Bricolage Grotesque', sans-serif !important;
     font-size: 3rem;
     font-weight: 800;
     letter-spacing: -0.04em;
-    color: #FCF5FF !important;
-    -webkit-text-fill-color: #FCF5FF !important;
     line-height: 1;
     margin-bottom: 0.6rem;
 }

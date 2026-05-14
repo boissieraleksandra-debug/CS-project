@@ -86,7 +86,7 @@ def render_liked_job(job, student_id):
 
         # if the student already applied, we show the status message and stop so the Apply button does not appear
         if job["already_applied"]:
-            st.success("Applied — we'll email you when the startup decides.")
+            st.success("Applied! We'll email you when the startup decides.")
             return
 
         # when the student clicks Apply, we save the application in the database for this student and job

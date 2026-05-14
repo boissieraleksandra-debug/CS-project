@@ -9,11 +9,18 @@ We also call init_db() so a teammate who clones the repo and just runs
 empty-but-valid database.
 """
 
+import base64
+from pathlib import Path
+
 import streamlit as st #for the user interface
 
 import auth #for restoring login state and logging out
 import ui #for loading our custom CSS and rendering the sidebar
 from db import init_db #create the database if it doesn't exist yet, so the app doesn't break for a teammate who forgets to run seed.py first
+
+# encode the logo as base64 so it can be embedded directly in the HTML hero box
+_logo1_path = Path(__file__).parent / "static" / "logo1.png"
+_logo1_b64 = base64.b64encode(_logo1_path.read_bytes()).decode() if _logo1_path.exists() else ""
 
 st.set_page_config(
     page_title="Profile · gigly",
@@ -25,16 +32,19 @@ st.set_page_config(
 
 init_db()
 auth.restore_login() #checks if the user was already logged in and restores their session state if so 
-ui.load_css() # load our custom CSS we wrote in page sytle.css
-ui.sidebar() # aplly the sidebar navigation
+ui.load_css() # load our custom CSS we wrote in page style.css
+ui.sidebar() # apply the sidebar navigation
 
 # ---- Hero ---------------------------------------------------------------
 st.markdown( # Render the hero banner using raw HTML so we can apply our visual design, the divider are the one we disigned in the CSS
-    """
+    f"""
     <div class='gigly-hero'>
-      <div class='gigly-hero-mark'>gigly</div>
+      <div style='display:flex; align-items:center; gap:16px; margin-bottom:16px;'>
+        <img src='data:image/png;base64,{_logo1_b64}' style='height:72px;'>
+        <span style='font-family:Bricolage Grotesque,sans-serif; font-size:2.8rem; font-weight:800; color:#FFFFFF;'>Gigly.</span>
+      </div>
       <div class='gigly-hero-sub'>Where students and startups build together.</div>
-      <div class='gigly-hero-meta'>Short-term roles. Real work. No noise.</div> 
+      <div class='gigly-hero-meta'>Short-term roles. Real work. No noise.</div>
     </div>
     """,
     unsafe_allow_html=True, # this line is required to inject HTML through st.markdown() as streamlit bloack HTML by default

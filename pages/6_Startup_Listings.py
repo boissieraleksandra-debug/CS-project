@@ -1,31 +1,50 @@
 """
 6_Startup_Listings.py — Startup's "main feed": their own job listings.
 """
+# the page aims to allow the startups to manage the jobs they post. So they can 
+# post new job, edit those already posted and so on. So we begin by importing the external tools we need. 
 
-import hashlib
+#import streamlit to be able to see the results.
+import streamlit as st 
 
-import streamlit as st
-
+#These are modules created to handle the login & the session logic. So it checks who logged in 
+# or takes care of restoring the session.
 import auth
+
+#Takes care of the visual part/ apprearance of the app.
 import ui
+
+#here instead of importing the whole database file, we import just the functions we need.
+# 1. initialise databse -> setup the database structure the first time the program runs.
+# 2. Inserts a new job that has been created into the database
+#3. With that we can edit a job that has already been created.
+#4. Collect all jobs belonging to a specific startup.
+#5. Give info about the startup profile.
+#6 Give info about the job details.
 from db import (
     init_db,
     create_job,
     update_job,
+    delete_job,
     list_jobs_for_startup,
     get_startup,
     get_job,
 )
+
 from mailer import send_email
 from templates import job_listed_confirm
 
+#The block will run again everytime the page loads or refreshes.
+#It sets up how the browser looks like (the layout, tab, titles etc).
 st.set_page_config(page_title="Listings · gigly", page_icon="g", layout="centered", initial_sidebar_state="expanded")
 init_db()
-auth.restore_login()
+auth.restore_login() #saves the session such that one stays logged in if the page gets refreshed.
 ui.load_css()
 ui.sidebar()
 
 # ---- Auth guard: startups only -----------------------------------------
+#ere the app makes sure that only startups can access this page. So if they don't have a profile set up, then they receive a message redirting them towards the profile page.
+#So they cannot create jobs if they didn't set up a profile. 
 if st.session_state.get("role") != "startup" or not st.session_state.get("startup_id"):
     st.warning("Please create your company profile first.")
     if st.button("Go to Company", type="primary", use_container_width=True):
@@ -35,6 +54,8 @@ if st.session_state.get("role") != "startup" or not st.session_state.get("startu
 startup_id = st.session_state["startup_id"]
 startup = get_startup(startup_id)
 
+#Have some lists/ dico here to not have to retype them all the time. So we have the industries and the job status.
+#The status shows whether the posted job is still running or is in progress (so a student is working on the task) or done.
 INDUSTRY_CHOICES = ["Marketing", "Tech", "Finance", "Sustainability", "Design", "Other"]
 STATUS_CHOICES = [
     ("open",        "Open (accepting applicants)"),
@@ -48,14 +69,77 @@ STATUS_CSS = {
     "done": "done",
 }
 
+#Here we made sure that every job card gets a picture even if the startup doesn't provide one on its own. It's based on the job title.
+#So if they don't provide a picture, the function will pick a picture that matches the job, according the industry.
+# reloads then it's still the same image.
+def _default_image(title: str, industry: str = "") -> str:
+    # Curated Unsplash photo IDs matched to job categories — deterministic, always relevant
+    #Each category is mapped to a specific pcture ID.
+    CATEGORY_IMAGES = {
+        "software":   "photo-1517694712202-14dd9538aa97",  # laptop with code
+        "design":     "photo-1561070791-2526d30994b5",     # design workspace
+        "marketing":  "photo-1460925895917-afdab827c52f",  # marketing laptop
+        "data":       "photo-1551288049-bebda4e38f71",     # analytics dashboard
+        "sales":      "photo-1521791136064-7986c2920216",  # business handshake
+        "product":    "photo-1507925921958-8a62f3d1a50d",  # sticky notes / planning
+        "finance":    "photo-1554224155-8d04cb21cd6c",     # finance / charts
+        "hr":         "photo-1529156069898-49953e39b3ac",  # team / people
+        "operations": "photo-1454165804606-c3d57bc86b40",  # office operations
+        "research":   "photo-1532094349884-543559c5b1dc",  # research / lab
+        "customer":   "photo-1556742049-0cfed4f6a45d",    # customer service
+        "legal":      "photo-1589829545856-d10d557cf95f",  # legal / documents
+        "writing":    "photo-1455390582262-044cdead277a",  # writing / content
+        "video":      "photo-1536240478700-b869ad10e128",  # video / camera
+        "default":    "photo-1497366216548-37526070297c",  # modern office
+    }
+    #And here, each category has a list of keywords to ensure that the most words are covered and therefore get a picture.
+    #Allows to reload thepage and still have the same picture.
 
-def _default_image(title: str) -> str:
-    """Generate a stable picsum URL from the job title so every job has a photo."""
-    h = hashlib.md5(title.encode("utf-8")).hexdigest()[:8]
-    return f"https://picsum.photos/seed/job-{h}/400/240"
+    KEYWORDS = {
+        "software":   ["software", "engineer", "developer", "coding", "backend", "frontend", "fullstack",
+                        "web", "mobile", "app", "programmer", "devops", "cloud", "security", "cybersecurity",
+                        "infrastructure", "platform", "api", "database", "qa", "testing", "embedded", "firmware"],
+        "design":     ["design", "designer", "ux", "ui", "graphic", "visual", "creative", "art",
+                        "illustration", "branding", "motion", "3d", "figma", "photoshop"],
+        "marketing":  ["marketing", "growth", "seo", "content", "social media", "social", "brand",
+                        "digital", "campaign", "media", "communications", "pr", "public relations",
+                        "email", "copywriter", "copy", "blogger", "influencer", "advertising"],
+        "data":       ["data", "analytics", "analyst", "scientist", "machine learning", "ai", "ml",
+                        "artificial intelligence", "deep learning", "nlp", "bi", "business intelligence",
+                        "statistics", "quantitative", "data engineer", "etl"],
+        "sales":      ["sales", "business development", "biz dev", "account", "revenue", "bdr", "sdr",
+                        "partnership", "partnerships", "deal", "closer", "commercial"],
+        "product":    ["product", "pm", "product manager", "program manager", "project manager",
+                        "scrum", "agile", "roadmap", "strategy"],
+        "finance":    ["finance", "financial", "accounting", "accountant", "cfo", "controller",
+                        "tax", "audit", "treasury", "investment", "budget", "payroll"],
+        "hr":         ["hr", "human resources", "recruiting", "recruiter", "talent", "people",
+                        "culture", "diversity", "onboarding", "benefits", "compensation"],
+        "operations": ["operations", "ops", "logistics", "supply chain", "procurement",
+                        "office manager", "facilities", "office", "admin", "administrative"],
+        "research":   ["research", "researcher", "scientist", "lab", "biology", "chemistry",
+                        "physics", "clinical", "scientific", "r&d"],
+        "customer":   ["customer", "support", "success", "service", "helpdesk", "care",
+                        "client", "cx", "community", "community manager"],
+        "legal":      ["legal", "law", "lawyer", "attorney", "compliance", "regulatory",
+                        "counsel", "policy", "privacy"],
+        "writing":    ["writer", "writing", "editor", "editorial", "journalist", "reporter",
+                        "technical writer", "documentation", "docs"],
+        "video":      ["video", "film", "filmmaker", "cinematographer", "editor", "youtube",
+                        "production", "multimedia", "podcast", "audio"],
+    }
+#If no key word matches, then the fall back option is chosen ("default photo").
+    t = title.lower()
+    for category, kws in KEYWORDS.items():
+        if any(kw in t for kw in kws):
+            pid = CATEGORY_IMAGES[category]
+            return f"https://images.unsplash.com/{pid}?w=400&h=240&fit=crop&auto=format"
+
+    return f"https://images.unsplash.com/{CATEGORY_IMAGES['default']}?w=400&h=240&fit=crop&auto=format"
 
 
 # ---- Header + new-job toggle -------------------------------------------
+#title Job Listing + ability to create a job by clicking on the + button, which then opens the job form.
 header_l, header_r = st.columns([4, 1])
 with header_l:
     st.markdown("# Listings")
@@ -72,6 +156,10 @@ st.write("")
 
 
 # ---- New-job form (toggled) --------------------------------------------
+#here the startups can create a new job card. they have to fulfill the fields. 
+#The publish button Published is pressed then the required fields are checked (they must be fulfilled). 
+#If correctly fulfilled then the job is saved in the database and the startup will receive a confirmation notification + the page will reload such that the job appears below and the job is saved in the database.
+#Cancel button just closes the form without saving the job.
 if st.session_state.get("new_job_form_open"):
     st.markdown("### Post a new role")
     with st.form("new_job"):
@@ -138,7 +226,7 @@ if st.session_state.get("new_job_form_open"):
             pay_rate=pay_rate.strip(),
             industry=industry,
             tags=tags.strip(),
-            image_url=image_url.strip() or _default_image(title),
+            image_url=image_url.strip() or _default_image(title, industry),
         )
 
         new_job = get_job(new_id)
@@ -153,6 +241,9 @@ st.write("")
 
 
 # ---- Existing job listings ---------------------------------------------
+#Here the jobs a startup has already posted, appear as card with the details of the jobs like the tags, duration, location etc.
+#Each card has an edit button to edit the job if needed. The changes are then saved into the database and the page reloads to show them directly.
+#The startup can also decide to delete a job listing.
 jobs = list_jobs_for_startup(startup_id)
 
 if not jobs:
@@ -238,4 +329,17 @@ for job in jobs:
                     status=e_status_key,
                 )
                 st.success("Role updated.")
+                st.rerun()
+
+            st.divider()
+            confirm_key = f"confirm_delete_{job['id']}"
+            st.checkbox("I want to delete this listing", key=confirm_key)
+            if st.button(
+                "Delete listing",
+                key=f"delete_{job['id']}",
+                type="primary",
+                disabled=not st.session_state.get(confirm_key, False),
+            ):
+                delete_job(job["id"])
+                st.toast("Listing deleted.")
                 st.rerun()
