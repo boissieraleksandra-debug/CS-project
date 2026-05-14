@@ -161,8 +161,8 @@ liked = list_liked_jobs(student_id)
 total       = len(apps)
 pending, in_progress, declined, completed = count_application_statuses(apps)
 
-# this row shows the main dashboard metrics so the student gets a quick overview first
-c1, c2, c3, c4 = st.columns([1.4, 1.4, 1.4, 1.4])
+# wider ratio for the last two columns so "In progress" and "Completed" don't get truncated
+c1, c2, c3, c4 = st.columns([2, 2, 3, 3])
 c1.metric("Applied",     total)
 c2.metric("Pending",     pending)
 c3.metric("In progress", in_progress)
