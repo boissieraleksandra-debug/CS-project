@@ -13,14 +13,14 @@ from db import (
     list_applications_for_startup,
 )
 
-# this sets up the dashboard page and loads the shared layout used across the app
+# this sets up the dashboard page and loads the layout of the app
 st.set_page_config(page_title="Dashboard · gigly", page_icon="g", layout="centered", initial_sidebar_state="expanded")
 init_db()
 auth.restore_login()
 ui.load_css()
 ui.sidebar()
 
-# startup-only access check
+# This checks that only a startup user can access this dashboard
 if st.session_state.get("role") != "startup" or not st.session_state.get("startup_id"):
     st.warning("Please create your company profile first.")
     if st.button("Go to Company", type="primary", use_container_width=True):
@@ -30,7 +30,7 @@ if st.session_state.get("role") != "startup" or not st.session_state.get("startu
 # here we get the id of the startup that is currently logged in so we can load its jobs and applicants
 startup_id = st.session_state["startup_id"]
 
-# these labels are used to display job status and application status clearly across the whole page
+# these labels are used to show the job status and application status
 JOB_STATUS_PILL = {
     "open":        ("open",        "Open"),
     "in_progress": ("in_progress", "In progress"),
@@ -45,16 +45,23 @@ APP_STATUS_PILL = {
 }
 
 
-def count_pending_and_accepted(apps):
-    # this function counts the pending and accepted applications for the top metrics row
+def count_application_statuses(apps):
+    # this function counts how many applications are pending, accepted, declined, or completed
     pending = 0
     accepted = 0
+    declined = 0
+    completed = 0
+
     for app in apps:
         if app["status"] == "pending":
             pending += 1
         if app["status"] == "accepted":
             accepted += 1
-    return pending, accepted
+        if app["status"] == "declined":
+            declined += 1
+        if app["status"] == "completed":
+            completed += 1
+    return pending, accepted, declined, completed
 
 
 def count_apps_by_job_id(apps):
@@ -113,11 +120,10 @@ st.write("")
 jobs = list_jobs_for_startup(startup_id)
 apps = list_applications_for_startup(startup_id)
 
-# top metrics
-# here we calculate the main numbers shown at the top of the page, like listings and total apps
+# here we calculate the numbers shown at the top of the page, like listings and total applications
 total_jobs    = len(jobs)
 total_apps    = len(apps)
-pending_apps, accepted_apps = count_pending_and_accepted(apps)
+pending_apps, accepted_apps, declined_apps, completed_apps = count_application_statuses(apps)
 
 # this row shows the startup dashboard metrics so the company gets a quick summary first
 c1, c2, c3, c4 = st.columns(4)
@@ -128,7 +134,7 @@ c4.metric("Accepted",   accepted_apps)
 
 st.write("")
 
-# applications per listing chart
+# here we create the bar chart for applications per listing 
 if jobs:
     # this chart shows how many applications each listing received so the startup can compare its roles
     st.markdown("### Applications per listing")
@@ -154,12 +160,11 @@ if jobs:
 
 st.write("")
 
-# detailed breakdown for each listing
 # here we start the section that shows one breakdown card for each listing
 st.markdown("### Per-listing breakdown")
 
 if not jobs:
-    # if the startup has no jobs yet, we show a message and stop here because there is nothing to break down
+    # if the startup has no jobs yet we show a message
     st.info("Post your first role from the Listings page to see status here.")
     st.stop()
 
@@ -186,7 +191,7 @@ for job in jobs:
             st.caption("apps")
 
         if not job_apps:
-            # if this listing has no applicants yet, we show a simple message inside the card
+            # if this listing has no applicants yet we show a simple message 
             st.caption("No applications yet.")
             continue
 

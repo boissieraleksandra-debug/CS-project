@@ -13,14 +13,14 @@ from db import (
     list_liked_jobs,
 )
 
-# this sets up the dashboard page and loads the shared layout used across the app
+# this sets up the dashboard page and loads the layout of the app
 st.set_page_config(page_title="Dashboard · gigly", page_icon="g", layout="centered", initial_sidebar_state="expanded")
 init_db()
 auth.restore_login()
 ui.load_css()
 ui.sidebar()
 
-# student-only access check
+# This checks that only students can access
 if st.session_state.get("role") != "student" or not st.session_state.get("student_id"):
     st.warning("Please create your student profile first.")
     if st.button("Go to Profile", type="primary", use_container_width=True):
@@ -30,7 +30,7 @@ if st.session_state.get("role") != "student" or not st.session_state.get("studen
 # here we get the id of the student who is currently logged in so we can load their dashboard data
 student_id = st.session_state["student_id"]
 
-# these colors are used in the charts on this page to keep the dashboard style consistent
+# these are the colors used in for the different phases of the application and the different industries
 PURPLE_PALETTE = {
     "Pending":                "#A78BFA",
     "Accepted (in progress)": "#7C3AED",
@@ -46,7 +46,7 @@ INDUSTRY_PALETTE = {
     "Design":         "#A78BFA",
 }
 
-# this keeps the label and helper text for each application status in one place for easier reuse
+# this tells the dashboard what style, label, and message to show for each application status
 STATUS_PILL = {
     "pending":   ("pending",   "Pending",   "Waiting for the startup to decide."),
     "accepted":  ("accepted",  "Accepted",  "Check your email — the startup sent contact info."),
@@ -56,45 +56,77 @@ STATUS_PILL = {
 
 
 def count_application_statuses(apps):
-    # this function counts how many applications are in each status so we can show metrics and charts
-    counts = {}
+    # this function counts how many applications are pending, accepted, declined, or completed
+    pending = 0
+    accepted = 0
+    declined = 0
+    completed = 0
+
     for app in apps:
-        status = app["status"]
-        counts[status] = counts.get(status, 0) + 1
-    return counts
+        if app["status"] == "pending":
+            pending += 1
+        if app["status"] == "accepted":
+            accepted += 1
+        if app["status"] == "declined":
+            declined += 1
+        if app["status"] == "completed":
+            completed += 1
+    return pending, accepted, declined, completed
 
 
-def build_status_chart_data(status_counts):
-    # here we build the small data table used by the donut chart that shows the application breakdown
+def build_status_chart_data(pending, accepted, declined, completed):
+    # here is the data table used by the donut chart that shows the application breakdown
     chart_data = []
-    status_pairs = [
-        ("pending", "Pending"),
-        ("accepted", "Accepted (in progress)"),
-        ("completed", "Completed"),
-        ("declined", "Declined"),
-    ]
-    for key, label in status_pairs:
-        count = status_counts.get(key, 0)
-        if count > 0:
-            chart_data.append({"status": label, "count": count})
+
+    if pending > 0:
+        chart_data.append({"status": "Pending", "count": pending})
+    if accepted > 0:
+        chart_data.append({"status": "Accepted (in progress)", "count": accepted})
+    if completed > 0:
+        chart_data.append({"status": "Completed", "count": completed})
+    if declined > 0:
+        chart_data.append({"status": "Declined", "count": declined})
     return chart_data
 
 
 def count_liked_industries(liked_jobs):
     # this function counts liked jobs by industry so we can see which areas interest the student most
-    counts = {}
+    marketing = 0
+    tech = 0
+    finance = 0
+    sustainability = 0
+    design = 0
+
     for job in liked_jobs:
         industry = job["industry"]
-        if industry:
-            counts[industry] = counts.get(industry, 0) + 1
-    return counts
+        if industry == "Marketing":
+            marketing += 1
+        if industry == "Tech":
+            tech += 1
+        if industry == "Finance":
+            finance += 1
+        if industry == "Sustainability":
+            sustainability += 1
+        if industry == "Design":
+            design += 1
+    return marketing, tech, finance, sustainability, design
 
 
-def build_industry_chart_data(industry_counts):
-    # here we turn the industry counts into a simple format that the bar chart can use
+def build_industry_chart_data(marketing, tech, finance, sustainability, design):
+    # # here we put the industry data into the format the chart needs and sort it from biggest to smallest
     chart_data = []
-    for industry, count in industry_counts.items():
-        chart_data.append({"industry": industry, "count": count})
+
+    if marketing > 0:
+        chart_data.append({"industry": "Marketing", "count": marketing})
+    if tech > 0:
+        chart_data.append({"industry": "Tech", "count": tech})
+    if finance > 0:
+        chart_data.append({"industry": "Finance", "count": finance})
+    if sustainability > 0:
+        chart_data.append({"industry": "Sustainability", "count": sustainability})
+    if design > 0:
+        chart_data.append({"industry": "Design", "count": design})
+
     chart_data.sort(key=lambda row: row["count"], reverse=True)
     return chart_data
 
@@ -124,16 +156,12 @@ st.write("")
 apps = list_applications_for_student(student_id)
 liked = list_liked_jobs(student_id)
 
-# top metrics
-# here we calculate the numbers shown in the top metrics row, like pending and completed
-status_counts = count_application_statuses(apps)
+# here we calculate the numbers we want to show at the top, like applied, pending, and completed 
 total       = len(apps)
-pending     = status_counts.get("pending",   0)
-in_progress = status_counts.get("accepted",  0)
-completed   = status_counts.get("completed", 0)
+pending, in_progress, declined, completed = count_application_statuses(apps)
 
-# this row shows the main dashboard metrics so the student gets a quick overview first
-c1, c2, c3, c4 = st.columns([1.4, 1.4, 1.4, 1.4])
+# wider ratio for the last two columns so "In progress" and "Completed" don't get truncated
+c1, c2, c3, c4 = st.columns([4, 4, 5, 5])
 c1.metric("Applied",     total)
 c2.metric("Pending",     pending)
 c3.metric("In progress", in_progress)
@@ -141,11 +169,11 @@ c4.metric("Completed",   completed)
 
 st.write("")
 
-# application status chart
+# This creates the Donut chart with the status breakdown 
 if total > 0:
     # this donut chart shows how the applications are split by status, like pending or completed
     st.markdown("### Application status")
-    chart_data = build_status_chart_data(status_counts)
+    chart_data = build_status_chart_data(pending, in_progress, declined, completed)
     fig = px.pie(
         chart_data,
         names="status",
@@ -162,17 +190,17 @@ if total > 0:
     )
     st.plotly_chart(fig, use_container_width=True)
 else:
-    # if there are no applications yet, we show a helpful message instead of an empty chart
+    # if there are no applications yet, we show a message 
     st.info("Apply to a few roles to see your status breakdown here.")
 
 st.write("")
 
-# saved jobs by industry chart
+# This create the bar chart for the liked jobs by industry 
 if liked:
     # this chart shows which industries appear most in the saved jobs the student liked
     st.markdown("### Saved roles by industry")
-    industry_counts = count_liked_industries(liked)
-    chart_data2 = build_industry_chart_data(industry_counts)
+    marketing, tech, finance, sustainability, design = count_liked_industries(liked)
+    chart_data2 = build_industry_chart_data(marketing, tech, finance, sustainability, design)
     fig2 = px.bar(
         chart_data2,
         x="industry",
@@ -190,12 +218,11 @@ if liked:
     )
     st.plotly_chart(fig2, use_container_width=True)
 else:
-    # if no jobs were saved yet, we show a helpful message instead of an empty chart
+    # if no jobs were saved yet we show a message 
     st.info("Save a few roles in Discover to see your interests visualized here.")
 
 st.write("")
 
-# full application list
 # here we show the full list of applications and their current status under the charts
 st.markdown("### All applications")
 if not apps:

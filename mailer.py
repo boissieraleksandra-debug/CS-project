@@ -13,6 +13,9 @@ Two modes, picked automatically:
 
 Either way every send is logged.
 """
+#The task of this page is to send emails from an app such that we don't have to have our own domain.
+#We used Brevo as the external email service by creating an API key there. It allows us to send actual emails to the users.
+#If we had to send more than 300 emails per day (limit on Brevo) then the email content would just be saved on the database instead of sending it.
 
 import os
 from typing import Optional, Tuple
@@ -24,17 +27,19 @@ try:
 except ImportError:
     pass
 
-from db import log_email
+from db import log_email #Here it imports the email loggin function from the database such that every attempt is recorded.
 
-
+#This function is called when an email needs to be sent. It gets the recipient's email, the email's subject and the body text.
+#And then it sees if there's an API key otherwise just saves in the db.
 def send_email(to_email: str, subject: str, body: str) -> Tuple[bool, Optional[str]]:
     """Send an email. Returns (ok, error_message)."""
+    #the following 3 lines read values from the .env file and look for the API key and returns just an empty str if it doesn't exist instead of crashing out.
     api_key = os.getenv("BREVO_API_KEY", "").strip()
     from_email = os.getenv("FROM_EMAIL", "").strip()
     from_name = os.getenv("FROM_NAME", "Gigly").strip()
 
     # ----- Simulated mode -----
-    # If no API key is set, just log to the database and pretend it sent.
+    # If no API key is set, then just log to the database and pretend it sent -> sent_ok= true.
     if not api_key:
         log_email(to_email, subject, body, sent_ok=True, error=None)
         return True, None
@@ -63,10 +68,13 @@ def send_email(to_email: str, subject: str, body: str) -> Tuple[bool, Optional[s
         )
 
         # Send and log success
+      
         api_instance.send_transac_email(email)
         log_email(to_email, subject, body, sent_ok=True, error=None)
         return True, None
-
+    
+    #Here, instead of crashing down if the content inside try fails (wrong API or no Intenet for ex) then it jumps to this exception.
+    #If something went wrong, then the error message is stored in e.
     except Exception as e:
         # Send failed — log the error so we can debug
         log_email(to_email, subject, body, sent_ok=False, error=str(e))

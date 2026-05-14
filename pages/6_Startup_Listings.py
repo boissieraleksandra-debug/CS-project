@@ -56,7 +56,7 @@ startup = get_startup(startup_id)
 
 #Have some lists/ dico here to not have to retype them all the time. So we have the industries and the job status.
 #The status shows whether the posted job is still running or is in progress (so a student is working on the task) or done.
-INDUSTRY_CHOICES = ["Marketing", "Tech", "Finance", "Sustainability", "Design", "Other"]
+INDUSTRY_CHOICES = ["Marketing", "Technology", "Finance", "Sustainability", "Design", "Other"]
 STATUS_CHOICES = [
     ("open",        "Open (accepting applicants)"),
     ("in_progress", "In progress"),
@@ -176,7 +176,6 @@ if st.session_state.get("new_job_form_open"):
             "Requirements", height=100,
             placeholder="Skills, tools, languages, etc.",
         )
-        email = st.text_input("Email")
         col1, col2 = st.columns(2)
         with col1:
             location = st.text_input("Location *", placeholder="Zurich, CH (hybrid)")
