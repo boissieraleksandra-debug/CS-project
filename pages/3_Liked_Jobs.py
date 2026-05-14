@@ -28,7 +28,7 @@ auth.restore_login()
 ui.load_css()
 ui.sidebar()
 
-# ---- Auth guard: students only -----------------------------------------
+# checks that only student profiles have access
 if st.session_state.get("role") != "student" or not st.session_state.get("student_id"):
     st.warning("Please create your student profile first.")
     if st.button("Go to Profile", type="primary", use_container_width=True):
